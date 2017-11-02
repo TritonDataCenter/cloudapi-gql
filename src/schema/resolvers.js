@@ -59,8 +59,8 @@ const resolvers = {
 
     package: (root, { id, name }) => api.packages.get({ id, name }),
 
-    machines: (root, { id, brand, state, tags, ...rest }, _, ctx) => {
-      return id
+    machines: (root, { id, brand, state, tags, ...rest }, _, ctx) =>
+      id
         ? api.machines.get({ id }).then(machine => [machine])
         : api.machines
             .list(
@@ -88,8 +88,7 @@ const resolvers = {
               }
 
               return machines.map(({ id }) => api.machines.get({ id }));
-            })
-          },
+            }),
 
     machine: (root, { id }) => api.machines.get({ id }),
 
