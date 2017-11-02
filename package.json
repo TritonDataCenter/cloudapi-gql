@@ -5,7 +5,7 @@
   "repository": "github:yldio/cloudapi-gql",
   "main": "src/schema/index.js",
   "scripts": {
-    "lint": "eslint . --fix --ext .js --ext .graphql",
+    "lint": "eslint . --fix --ext .js --ext .graphql --ext .md",
     "fmt": "prettier --write --single-quote src/**/*.js src/*.js src/**/*.graphql",
     "test": "echo 0",
     "start": "PORT=4000 node src/server.js",
