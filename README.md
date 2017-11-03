@@ -16,13 +16,13 @@ Server that exposes [CloudApi](https://apidocs.joyent.com/cloudapi/) through
 ## Install
 
 ```
-yarn add cloudapi-gql
+yarn install cloudapi-gql
 ```
 
 ## Usage
 
 ```
-yarn run start
+yarn run dev
 ```
 
 * [GraphiQL](http://0.0.0.0:4000/graphiql)
@@ -41,12 +41,6 @@ yarn run faker
 * [GraphQL Faker API](http://0.0.0.0:9002/graphql)
 
 ![](https://cldup.com/VWadVMorQ0.png)
-
-## Todo
-
-* [ ] Finish missing connections, transforms, and mutations
-* [ ] remove node-triton dependency
-* [ ] support multiple users on the same server
 
 ## License
 

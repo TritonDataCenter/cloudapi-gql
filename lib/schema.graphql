@@ -1009,8 +1009,8 @@ type Mutation {
     # Machine id
     id: ID!
     # Metadata key
-    key: String!
-  ): String
+    name: String!
+  ): Machine
   # Deletes all metadata keys from this instance
   deleteAllMachineMetadata(
     # Machine id
@@ -1034,8 +1034,8 @@ type Mutation {
   deleteMachineTag(
     # Machine id
     id: ID!
-    # tag key
-    tags: [KeyValueInput]!
+    # tag name
+    name: String!
   ): Machine
   # Deletes all tags from an instance
   deleteMachineTags(
