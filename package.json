@@ -7,9 +7,9 @@
   "scripts": {
     "predev": "npm run graphdoc",
     "dev": "NODE_ENV=development node -r ./.env.js dev-server.js",
-    "fake": "graphql-faker ./lib/schema/schema.graphql -p 4000",
-    "faker": "graphql-faker ./lib/schema/schema.graphql",
-    "graphdoc": "graphdoc -s ./lib/schema/schema.graphql -o ./doc --force",
+    "fake": "graphql-faker ./lib/schema.graphql -p 4000",
+    "faker": "graphql-faker ./lib/schema.graphql",
+    "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
     "lint": "belly-button --fix"
   },
   "dependencies": {
