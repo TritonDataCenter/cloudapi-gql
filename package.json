@@ -14,9 +14,10 @@
   },
   "dependencies": {
     "boom": "^6.0.0",
+    "bounce": "^1.2.0",
     "bunyan": "^1.8.12",
     "force-array": "^3.1.0",
-    "graphi": "^4.0.0",
+    "graphi": "^4.1.0",
     "graphql-tools": "^2.6.1",
     "hasha": "^3.0.0",
     "triton": "^5.4.0",
