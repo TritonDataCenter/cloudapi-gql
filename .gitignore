@@ -1,2 +1,6 @@
 doc
 node_modules
+.env.js
+.eslintcache
+.DS_Store
+package-lock.json

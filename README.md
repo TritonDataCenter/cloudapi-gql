@@ -16,13 +16,13 @@ Server that exposes [CloudApi](https://apidocs.joyent.com/cloudapi/) through
 ## Install
 
 ```
-yarn add cloudapi-gql
+npm install cloudapi-gql
 ```
 
 ## Usage
 
 ```
-yarn run start
+npm run dev
 ```
 
 * [GraphiQL](http://0.0.0.0:4000/graphiql)
@@ -34,7 +34,7 @@ yarn run start
 ![](https://cldup.com/A-VwSbvWBe.png) ![](https://cldup.com/08P360Skhx.png)
 
 ```
-yarn run faker
+npm run faker
 ```
 
 * [GraphQL Faker Interactive Editor](http://0.0.0.0:9002/editor)
