@@ -6,7 +6,7 @@
   "main": "lib",
   "scripts": {
     "predev": "npm run graphdoc",
-    "dev": "NODE_ENV=development node dev-server.js",
+    "dev": "NODE_ENV=development nodemon dev-server.js",
     "fake": "graphql-faker ./lib/schema.graphql -p 4000",
     "faker": "graphql-faker ./lib/schema.graphql",
     "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
@@ -31,9 +31,15 @@
     "graphql-playground": "1.0.8",
     "graphql-voyager": "^1.0.0-rc.9",
     "hapi": "^16.6.2",
-    "inert": "^4.2.1"
+    "inert": "^4.2.1",
+    "nodemon": "^1.12.1"
   },
   "resolutions": {
     "graphql": "0.11.7"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "doc/*"
+    ]
   }
 }

@@ -2,6 +2,7 @@
 
 // Requires .env.js file with the following exports:
 // SDC_URL, SDC_KEY_ID, SDC_KEY_PATH
+require('./.env.js');
 
 const { hapi: Voyager } = require('graphql-voyager/middleware');
 const { hapi: Playground } = require('graphql-playground/middleware');
