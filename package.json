@@ -22,6 +22,7 @@
     "graphql-tools": "^2.6.1",
     "hasha": "^3.0.0",
     "triton": "^5.4.0",
+    "user-home": "^2.0.0",
     "wreck": "^14.0.2"
   },
   "devDependencies": {
