@@ -13,30 +13,25 @@
     "lint": "belly-button --fix"
   },
   "dependencies": {
-    "apr-intercept": "^1.0.4",
     "boom": "^7.1.1",
     "bounce": "^1.2.0",
     "bunyan": "^1.8.12",
     "force-array": "^3.1.0",
-    "graphi": "^4.1.0",
+    "graphi": "^5.2.0",
     "graphql-tools": "^2.6.1",
     "hasha": "^3.0.0",
     "triton": "^5.4.0",
-    "user-home": "^2.0.0",
     "wreck": "^14.0.2"
   },
   "devDependencies": {
     "@2fd/graphdoc": "^2.4.0",
     "belly-button": "^4.0.1",
     "graphql-faker": "^1.4.0",
-    "graphql-playground": "1.0.8",
+    "graphql-playground-html": "^1.4.2",
     "graphql-voyager": "^1.0.0-rc.9",
-    "hapi": "^16.6.2",
-    "inert": "^4.2.1",
+    "hapi": "^17.2.0",
+    "inert": "^5.0.1",
     "nodemon": "^1.12.1"
-  },
-  "resolutions": {
-    "graphql": "0.11.7"
   },
   "nodemonConfig": {
     "ignore": [

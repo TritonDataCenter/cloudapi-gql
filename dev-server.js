@@ -4,60 +4,49 @@
 // SDC_URL, SDC_KEY_ID, SDC_KEY_PATH
 require('./.env.js');
 
-const { hapi: Voyager } = require('graphql-voyager/middleware');
-const { hapi: Playground } = require('graphql-playground/middleware');
+const { renderVoyagerPage } = require('graphql-voyager/middleware');
+const { renderPlaygroundPage } = require('graphql-playground-html');
 const Hapi = require('hapi');
 const Inert = require('inert');
 const CloudApiGql = require('./');
 
 
-const server = new Hapi.Server({
-  debug: {
-    log: ['error'],
-    request: ['error']
-  }
-});
-
-const handlerError = (err) => {
-  if (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    process.exit(1);
-  }
-};
-
-server.connection({
-  port: 4000,
-  routes: {
-    cors: {
-      origin: ['*'],
-      credentials: true,
-      additionalHeaders: ['Cookie']
-    }
-  }
-});
-
-server.register(
-  [
-    Inert,
-    CloudApiGql,
-    {
-      register: Playground,
-      options: {
-        path: '/playground',
-        endpointUrl: '/graphql'
+const start = async () => {
+  const server = Hapi.server({
+    port: 4000,
+    routes: {
+      cors: {
+        origin: ['*'],
+        credentials: true,
+        additionalHeaders: ['Cookie']
       }
     },
-    {
-      register: Voyager,
-      options: {
-        path: '/voyager',
-        endpointUrl: '/graphql'
-      }
+    debug: {
+      log: ['error'],
+      request: ['error']
     }
-  ],
-  (err) => {
-    handlerError(err);
+  });
+
+  server.events.on('log', (event, tags) => {
+    if (tags.error) {
+      console.log(event);
+    }
+  });
+
+  server.events.on('request', (request, event) => {
+    const { tags } = event;
+    if (tags.includes('error') && event.data && event.data.errors) {
+      event.data.errors.forEach((error) => {
+        console.log(error);
+      });
+    }
+  });
+
+  await server.register(
+    [
+      Inert,
+      CloudApiGql
+    ]);
 
     server.route([
       {
@@ -72,13 +61,35 @@ server.register(
             }
           }
         }
+      },
+      {
+        method: 'GET',
+        path: '/voyager',
+        handler: (request, h) => {
+          const rendered = renderVoyagerPage({ path: '/voyager', endpointUrl: '/graphql'});
+          return h.response(rendered).type('text/html');
+        }
+      },
+      {
+        method: 'GET',
+        path: '/playground',
+        handler: async (request, h) => {
+          const rendered = await renderPlaygroundPage({
+            path: '/playground',
+            endpoint: '/graphql',
+            version: '1.3.20',
+            env: 'development',
+            htmlTitle: 'CloudAPI GQL'
+          });
+          return h.response(rendered).type('text/html');
+        }
       }
     ]);
 
-    server.start((err) => {
-      handlerError(err);
-      // eslint-disable-next-line no-console
-      console.log(`server started at http://0.0.0.0:${server.info.port}`);
-    });
-  }
-);
+    await server.start();
+
+    // eslint-disable-next-line no-console
+    console.log(`server started at http://0.0.0.0:${server.info.port}`);
+};
+
+start();
