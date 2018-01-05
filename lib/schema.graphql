@@ -133,6 +133,7 @@ enum SnapshotState {
 }
 
 type Snapshot {
+  id: ID
   # The name of this snapshot
   name: ID
   # The current state of the snapshot
