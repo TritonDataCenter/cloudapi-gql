@@ -8,8 +8,19 @@ const { renderVoyagerPage } = require('graphql-voyager/middleware');
 const { renderPlaygroundPage } = require('graphql-playground-html');
 const Hapi = require('hapi');
 const Inert = require('inert');
+const Sso = require('minio-proto-auth');
 const CloudApiGql = require('./');
 
+const {
+  COOKIE_PASSWORD,
+  COOKIE_DOMAIN,
+  SDC_KEY_PATH,
+  SDC_ACCOUNT,
+  SDC_KEY_ID,
+  SDC_URL,
+  BASE_URL = 'http://0.0.0.0:4000',
+  NODE_ENV
+} = process.env;
 
 const start = async () => {
   const server = Hapi.server({
@@ -45,7 +56,33 @@ const start = async () => {
   await server.register(
     [
       Inert,
-      CloudApiGql
+      {
+        plugin: Sso,
+        options: {
+          cookie: {
+            password: COOKIE_PASSWORD,
+            domain: COOKIE_DOMAIN,
+            isSecure: false,
+            isHttpOnly: true,
+            ttl: 1000 * 60 * 60       // 1 hour
+          },
+          sso: {
+            keyPath: SDC_KEY_PATH,
+            keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
+            apiBaseUrl: SDC_URL,
+            url: 'https://sso.joyent.com/login',
+            permissions: { 'cloudapi': ['/my/*'] },
+            baseUrl: BASE_URL,
+            isDev: NODE_ENV === 'development'
+          }
+        }
+      },
+      {
+        plugin: CloudApiGql,
+        options: {
+          authStrategy: 'sso'
+        }
+      }
     ]);
 
     server.route([
@@ -81,13 +118,15 @@ const start = async () => {
             env: 'development',
             htmlTitle: 'CloudAPI GQL'
           });
+
           return h.response(rendered).type('text/html');
         }
       }
     ]);
 
-    await server.start();
+    server.auth.default('sso');
 
+    await server.start();
     // eslint-disable-next-line no-console
     console.log(`server started at http://0.0.0.0:${server.info.port}`);
 };

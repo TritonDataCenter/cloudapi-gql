@@ -466,8 +466,6 @@ type Query {
   account: User
   # Lists all public keys we have on record for the specified account
   keys(
-    # only retrieve keys from specified username
-    login: String
     # name of the key to filter
     name: String
   ): [Key]
@@ -475,8 +473,6 @@ type Query {
   key(
     # name of the key to retrieve
     name: String!
-    # only retrieve keys from specified username. required for sub-users
-    login: String
   ): Key
   # Returns a list of an account's user objects
   users(
@@ -625,7 +621,7 @@ type Query {
     # Name of metadata value to retrieve
     name: String
   ): [KeyValue]
-  # Gets the state of the named snapshot
+  # Gets the value of a named metadata
   metadataValue(
     # Machine id
     machine: ID!
@@ -729,7 +725,7 @@ type Mutation {
     # Name for this key
     name: String
     # OpenSSH formatted public key
-    fingerprint: String!
+    key: String!
   ): Key
   # Deletes a single SSH key, by name or fingerprint
   deleteKey(
@@ -997,7 +993,7 @@ type Mutation {
     # Machine id
     id: ID!
     snapshot: ID!
-  ): Snapshot
+  ): Machine
   # Allows you to update the metadata for a given instance. Note that updating the metadata via CloudAPI will result in the metadata being updated in the running instance. The semantics of this call are subtly different that the AddMachineTags call -- any metadata keys passed in here are created if they do not exist, and overwritten if they do.
   updateMachineMetadata(
     # Machine id
