@@ -1,3 +1,5 @@
+scalar Any
+
 enum AffinityRuleType {
   MUST_SAME_NODE
   SHOULD_SAME_NODE
@@ -85,7 +87,9 @@ type FirewallRule {
   # Indicates if the rule is enabled
   enabled: Boolean
   # Firewall rule
-  rule: String
+  rule_str: String
+  # Firewall rule
+  rule_obj: Any
   # Indicates if the rule is global
   global: Boolean
   # Human-readable description for the rule
