@@ -1,10 +1,10 @@
 scalar Any
 
 enum AffinityRuleType {
-  MUST_SAME_NODE
-  SHOULD_SAME_NODE
-  MUST_DIFF_NODE
-  SHOW_DIFF_NODE
+  MUST_EQUAL
+  SHOULD_EQUAL
+  MUST_NOT_EQUAL
+  SHOULD_NOT_EQUAL
 }
 
 input AffinityRule {
@@ -945,11 +945,11 @@ type Mutation {
   # When Triton CNS is enabled, the DNS search domain of the new VM will be automatically set to the suffix of the "instance" record that is created for that VM. For example, if the full CNS name of the new VM would be "foo.inst.35ad1ec4-2eab-11e6-ac02-8f56c66976a1.us-west-1.triton.zone", its automatic DNS search path would include "inst.35ad1ec4-2eab-11e6-ac02-8f56c66976a1.us-west-1.triton.zone". This can be changed later within the instance, if desired.
   createMachine(
     # Friendly name for this instance; default is the first 8 characters of the machine id. If the name includes the string {{shortId}}, any instances of that tag within the name will be replaced by the first 8 characters of the machine id.
-    name: String
+    name: String!
     # Id of the package to use on provisioning, obtained from ListPackages
-    package: ID
+    package: ID!
     # The image UUID
-    image: ID
+    image: ID!
     # Desired networks ids
     networks: [ID]
     # Optional array of affinity rules
