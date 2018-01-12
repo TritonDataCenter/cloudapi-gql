@@ -957,7 +957,7 @@ type Mutation {
     # An arbitrary set of metadata key/value pairs can be set at provision time, but they must be prefixed with "metadata"
     metadata: [KeyValueInput]
     # An arbitrary set of tags can be set at provision time, but they must be prefixed with "tag"
-    tag: [KeyValueInput]
+    tags: [KeyValueInput]
     # Completely enable or disable firewall for this instance. Default is false
     firewall_enabled: Boolean
   ): Machine
