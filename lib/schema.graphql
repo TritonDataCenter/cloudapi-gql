@@ -98,6 +98,24 @@ type FirewallRule {
   machines: [Machine]
 }
 
+# temporary!!
+type CreateMachineFirewallRule {
+  # Unique identifier for this rule
+  id: ID
+  # Indicates if the rule is enabled
+  enabled: Boolean
+  # Firewall rule
+  rule_str: String
+  # Firewall rule
+  rule_obj: Any
+  # Indicates if the rule is global
+  global: Boolean
+  # Human-readable description for the rule
+  description: String
+  tag: Boolean
+}
+
+
 enum CallerType {
   BASIC
   OPERATOR
@@ -667,6 +685,10 @@ type Query {
     # Unique identifier for this rule
     id: ID!
   ): FirewallRule
+  # temporary!!
+  firewall_rules_create_machine(
+    tags: [KeyValueInput]
+  ): [CreateMachineFirewallRule]
   # List all vlans for the current account
   vlans(
     # Unique identifier for this vlan
