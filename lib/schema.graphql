@@ -484,6 +484,7 @@ type User {
 }
 
 type Query {
+  rndName: String
   # Retrieves your account details
   account: User
   # Lists all public keys we have on record for the specified account
