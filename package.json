@@ -1,6 +1,6 @@
 {
   "name": "cloudapi-gql",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "license": "MPL-2.0",
   "repository": "github:yldio/joyent-portal",
   "main": "lib",
@@ -24,6 +24,7 @@
     "hasha": "^3.0.0",
     "random-int": "^1.0.0",
     "reach": "^1.0.0",
+    "sentiment": "^4.2.0",
     "wreck": "^14.0.2"
   },
   "devDependencies": {
