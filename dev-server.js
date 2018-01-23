@@ -2,7 +2,7 @@
 
 // Requires .env.js file with the following exports:
 // SDC_URL, SDC_KEY_ID, SDC_KEY_PATH
-require('./.env.js');
+require('./env.js');
 
 const { renderVoyagerPage } = require('graphql-voyager/middleware');
 const { renderPlaygroundPage } = require('graphql-playground-html');
@@ -85,50 +85,50 @@ const start = async () => {
       }
     ]);
 
-    server.route([
-      {
-        method: 'GET',
-        path: '/doc/{param*}',
-        config: {
-          handler: {
-            directory: {
-              path: './doc',
-              redirectToSlash: true,
-              index: true
-            }
+  server.route([
+    {
+      method: 'GET',
+      path: '/doc/{param*}',
+      config: {
+        handler: {
+          directory: {
+            path: './doc',
+            redirectToSlash: true,
+            index: true
           }
         }
-      },
-      {
-        method: 'GET',
-        path: '/voyager',
-        handler: (request, h) => {
-          const rendered = renderVoyagerPage({ path: '/voyager', endpointUrl: '/graphql'});
-          return h.response(rendered).type('text/html');
-        }
-      },
-      {
-        method: 'GET',
-        path: '/playground',
-        handler: async (request, h) => {
-          const rendered = await renderPlaygroundPage({
-            path: '/playground',
-            endpoint: '/graphql',
-            version: '1.3.20',
-            env: 'development',
-            htmlTitle: 'CloudAPI GQL'
-          });
-
-          return h.response(rendered).type('text/html');
-        }
       }
-    ]);
+    },
+    {
+      method: 'GET',
+      path: '/voyager',
+      handler: (request, h) => {
+        const rendered = renderVoyagerPage({ path: '/voyager', endpointUrl: '/graphql'});
+        return h.response(rendered).type('text/html');
+      }
+    },
+    {
+      method: 'GET',
+      path: '/playground',
+      handler: async (request, h) => {
+        const rendered = await renderPlaygroundPage({
+          path: '/playground',
+          endpoint: '/graphql',
+          version: '1.3.20',
+          env: 'development',
+          htmlTitle: 'CloudAPI GQL'
+        });
 
-    server.auth.default('sso');
+        return h.response(rendered).type('text/html');
+      }
+    }
+  ]);
 
-    await server.start();
-    // eslint-disable-next-line no-console
-    console.log(`server started at http://0.0.0.0:${server.info.port}`);
+  server.auth.default('sso');
+
+  await server.start();
+  // eslint-disable-next-line no-console
+  console.log(`server started at http://0.0.0.0:${server.info.port}`);
 };
 
 start();
