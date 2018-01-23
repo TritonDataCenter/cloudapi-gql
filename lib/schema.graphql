@@ -70,6 +70,8 @@ type Network {
   routes: [KeyValue]
   # Provision internet NAT zone on gateway address',
   internet_nat: Boolean
+  # machines that are attached in this network
+  machines: [Machine]
 }
 
 type VLAN {
