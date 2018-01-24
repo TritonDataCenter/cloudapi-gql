@@ -22,6 +22,8 @@
     "graphi": "^5.2.0",
     "graphql-tools": "^2.6.1",
     "hasha": "^3.0.0",
+    "lodash.isundefined": "^3.0.1",
+    "lodash.uniq": "^4.5.0",
     "random-int": "^1.0.0",
     "reach": "^1.0.0",
     "sentiment": "^4.2.0",
