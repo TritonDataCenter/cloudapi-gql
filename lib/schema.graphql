@@ -378,6 +378,8 @@ type Image {
   os: ImageOS
   # The version for this image'
   version: String
+  # A short prose description of this image
+  description: String
   # What kind of image this is. The values differ after v8.0.0+
   type: ImageType
   # Contains a grouping of various minimum requirements for provisioning an instance with this image. For example "password" indicates that a password must be provided
