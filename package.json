@@ -15,29 +15,29 @@
     "test": "lab -c"
   },
   "dependencies": {
-    "apr-map": "^3.0.3",
-    "boom": "^7.1.1",
-    "bounce": "^1.2.0",
-    "force-array": "^3.1.0",
-    "fwrule": "^1.4.1",
-    "graphi": "^5.3.0",
-    "graphql-tools": "2.20.2",
-    "hasha": "^3.0.0",
-    "lodash.uniq": "^4.5.0",
-    "sentiment": "^4.2.0",
-    "wreck": "^14.0.2"
+    "apr-map": "3.x.x",
+    "boom": "7.x.x",
+    "bounce": "^1.x.x",
+    "force-array": "3.1.x",
+    "fwrule": "1.4.x",
+    "graphi": "5.x.x",
+    "graphql-tools": "2.21.x",
+    "hasha": "3.0.x",
+    "lodash.uniq": "4.5.x",
+    "sentiment": "4.2.x",
+    "wreck": "14.x.x"
   },
   "devDependencies": {
-    "@2fd/graphdoc": "^2.4.0",
-    "belly-button": "^4.1.1",
-    "code": "5.1.2",
-    "graphql-faker": "^1.7.0",
-    "graphql-playground-html": "^1.5.2",
-    "graphql-voyager": "^1.0.0-rc.11",
-    "hapi": "^17.2.0",
-    "inert": "^5.1.0",
-    "lab": "15.2.2",
-    "hapi-triton-auth": "^1.0.0",
-    "stand-in": "4.1.0"
+    "@2fd/graphdoc": "2.x.x",
+    "belly-button": "4.x.x",
+    "code": "5.x.x",
+    "graphql-faker": "1.x.x",
+    "graphql-playground-html": "1.x.x",
+    "graphql-voyager": "1.0.0-rc.12",
+    "hapi": "17.x.x",
+    "inert": "5.x.x",
+    "lab": "15.x.x",
+    "hapi-triton-auth": "1.x.x",
+    "stand-in": "4.x.x"
   }
 }
