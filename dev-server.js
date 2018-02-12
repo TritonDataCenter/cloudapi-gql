@@ -8,7 +8,7 @@ const { renderVoyagerPage } = require('graphql-voyager/middleware');
 const { renderPlaygroundPage } = require('graphql-playground-html');
 const Hapi = require('hapi');
 const Inert = require('inert');
-const Sso = require('minio-proto-auth');
+const Sso = require('hapi-triton-auth');
 const CloudApiGql = require('./');
 
 const {
@@ -80,7 +80,10 @@ const start = async () => {
       {
         plugin: CloudApiGql,
         options: {
-          authStrategy: 'sso'
+          authStrategy: 'sso',
+          keyPath: SDC_KEY_PATH,
+          keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
+          apiBaseUrl: SDC_URL
         }
       }
     ]);

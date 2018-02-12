@@ -2,47 +2,42 @@
   "name": "cloudapi-gql",
   "version": "4.6.0",
   "license": "MPL-2.0",
-  "repository": "github:yldio/joyent-portal",
+  "repository": "github:joyent/cloudapi-gql",
   "main": "lib",
   "scripts": {
     "predev": "npm run graphdoc",
-    "dev": "NODE_ENV=development nodemon dev-server.js",
+    "dev": "NODE_ENV=development node --inspect dev-server.js",
     "fake": "graphql-faker ./lib/schema.graphql -p 4000",
     "faker": "graphql-faker ./lib/schema.graphql",
     "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
-    "lint": "belly-button --fix"
+    "lint": "belly-button --fix",
+    "pretest": "npm run lint",
+    "test": "lab -c"
   },
   "dependencies": {
     "apr-map": "^3.0.3",
     "boom": "^7.1.1",
     "bounce": "^1.2.0",
-    "constant-case": "^2.0.0",
     "force-array": "^3.1.0",
     "fwrule": "^1.4.1",
     "graphi": "^5.3.0",
-    "graphql-tools": "^2.19.0",
+    "graphql-tools": "2.20.2",
     "hasha": "^3.0.0",
-    "lodash.isundefined": "^3.0.1",
     "lodash.uniq": "^4.5.0",
-    "random-int": "^1.0.0",
-    "reach": "^1.0.0",
     "sentiment": "^4.2.0",
     "wreck": "^14.0.2"
   },
   "devDependencies": {
     "@2fd/graphdoc": "^2.4.0",
     "belly-button": "^4.1.1",
+    "code": "5.1.2",
     "graphql-faker": "^1.7.0",
     "graphql-playground-html": "^1.5.2",
     "graphql-voyager": "^1.0.0-rc.11",
     "hapi": "^17.2.0",
     "inert": "^5.1.0",
-    "minio-proto-auth": "^1.1.0",
-    "nodemon": "^1.14.11"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "doc/*"
-    ]
+    "lab": "15.2.2",
+    "hapi-triton-auth": "^1.0.0",
+    "stand-in": "4.1.0"
   }
 }
