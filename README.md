@@ -1,28 +1,45 @@
 # cloudapi-gql
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
-[![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg)](https://github.com/RichardLitt/standard-readme)
 
-Server that exposes [CloudApi](https://apidocs.joyent.com/cloudapi/) through
+[![Build Status](https://secure.travis-ci.org/joyent/cloudapi-gql.svg)](http://travis-ci.org/joyent/cloudapi-gql)
+
+
+hapi plugin that exposes [CloudApi](https://apidocs.joyent.com/cloudapi/) through
 [GraphQL](http://graphql.org).
 
 ## Table of Contents
 
 * [Install](#install)
+* [Options](#options)
 * [Usage](#usage)
-* [Todo](#todo)
-* [License](#license)
 
 ## Install
 
 ```
-yarn install cloudapi-gql
+npm install cloudapi-gql
 ```
+
+## Options
+
+- `authStrategy`: name of the hapi auth strategy to use for `/graphql` route
+- `keyPath` private key file path for the key associated with Triton account
+- `keyId`: string in the form of `/${SDC_ACCOUNT}/keys/${SDC_KEY_ID}`
+- `apiBaseUrl`: cloud API base URL to connect to
+
 
 ## Usage
 
+```js
+const server = new Hapi.Server();
+await server.register({ plugin: CloudApiGQL, options: { authStrategy, keyPath, keyId, apiBaseUrl } });
 ```
-yarn run dev
+
+
+### Local development
+
+```
+npm run dev
 ```
 
 * [GraphiQL](http://0.0.0.0:4000/graphiql)
@@ -34,7 +51,7 @@ yarn run dev
 ![](https://cldup.com/A-VwSbvWBe.png) ![](https://cldup.com/08P360Skhx.png)
 
 ```
-yarn run faker
+npm run faker
 ```
 
 * [GraphQL Faker Interactive Editor](http://0.0.0.0:9002/editor)
@@ -42,6 +59,3 @@ yarn run faker
 
 ![](https://cldup.com/VWadVMorQ0.png)
 
-## License
-
-MPL-2.0
