@@ -134,4 +134,8 @@ const start = async () => {
   console.log(`server started at http://0.0.0.0:${server.info.port}`);
 };
 
+process.on('unhandledRejection', (err) => {
+  console.error(err);
+});
+
 start();
