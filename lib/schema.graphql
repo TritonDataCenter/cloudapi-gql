@@ -475,11 +475,11 @@ type User {
   login: String
   # Email address
   email: String
-  company_name: String
-  first_name: String @fake(type: firstName)
-  last_name: String
+  companyName: String
+  firstName: String
+  lastName: String
   address: String
-  postal_code: String
+  postalCode: String
   city: String
   state: String
   country: String

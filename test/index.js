@@ -21,8 +21,7 @@ it('can be registered with hapi', async () => {
 
 it('can query for a random machine name', async () => {
   const server = new Hapi.Server();
-  StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
-    stand.restore();
+  StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
     return [];
   });
 
@@ -35,5 +34,23 @@ it('can query for a random machine name', async () => {
   });
   expect(res.statusCode).to.equal(200);
   expect(res.result.data.rndName).to.exist();
+  await server.stop();
+});
+
+it('can query for a random image', async () => {
+  const server = new Hapi.Server();
+  StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+    return [];
+  });
+
+  await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+  await server.initialize();
+  const res = await server.inject({
+    url: '/graphql',
+    method: 'post',
+    payload: { query: 'query { rndImageName }' }
+  });
+  expect(res.statusCode).to.equal(200);
+  expect(res.result.data.rndImageName).to.exist();
   await server.stop();
 });
