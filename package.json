@@ -12,7 +12,7 @@
     "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
     "lint": "belly-button --fix",
     "pretest": "npm run lint",
-    "test": "lab -c --coverage-path lib"
+    "test": "lab -c --coverage-path lib -a code"
   },
   "dependencies": {
     "apr-map": "3.x.x",

@@ -76,7 +76,7 @@ type Network {
 
 type VLAN {
   # A number from 0-4095 that indicates the VLAN's id
-  id: ID
+  id: Int
   # A unique name to identify the VLAN
   name: String
   # An optional description of the VLAN
@@ -710,24 +710,24 @@ type Query {
   # List all vlans for the current account
   vlans(
     # Unique identifier for this vlan
-    id: ID
+    id: Int
   ): [VLAN]
   # Retrieves an individual vlan
   vlan(
     # Unique identifier for this vlan
-    id: ID!
+    id: Int!
   ): VLAN
   # Lists all of the networks. If the vlan parameter is specified, then only fabric networks are returned
   networks(
     id: ID
     # VLAN id
-    vlan: ID
+    vlan: Int
   ): [Network]
   # Retrieves an individual network rule
   network(
     id: ID!
     # VLAN id
-    vlan: ID
+    vlan: Int
   ): Network
   # List all the NICs on an instance
   nics(
