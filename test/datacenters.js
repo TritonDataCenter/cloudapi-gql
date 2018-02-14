@@ -10,10 +10,14 @@ const CloudApi = require('../lib/cloudapi');
 
 
 const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
+const { describe, it, afterEach } = lab;
 
 
 describe('datacenters', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
   it('can get all datacenters', async () => {
     const datacenters = {
       'us-west-1': 'http://test.com'

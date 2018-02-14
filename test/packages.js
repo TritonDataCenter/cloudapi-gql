@@ -10,7 +10,7 @@ const CloudApi = require('../lib/cloudapi');
 
 
 const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
+const { describe, it, afterEach } = lab;
 
 
 describe('packages', () => {
@@ -25,6 +25,10 @@ describe('packages', () => {
     default: false,
     version: '1.0.0'
   };
+
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
 
   it('can get all packages', async () => {
     const server = new Hapi.Server();
