@@ -10,10 +10,14 @@ const CloudApi = require('../lib/cloudapi');
 
 
 const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
+const { describe, it, afterEach } = lab;
 
 
 describe('config', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
   it('can get all configs', async () => {
     const config = {
       default_network: '45607081-4cd2-45c8-baf7-79da760fffaa'

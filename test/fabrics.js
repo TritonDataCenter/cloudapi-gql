@@ -10,7 +10,7 @@ const CloudApi = require('../lib/cloudapi');
 
 
 const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
+const { describe, it, afterEach } = lab;
 
 
 describe('machines', () => {
@@ -30,6 +30,10 @@ describe('machines', () => {
     subnet: '192.168.128.0/22',
     vlan_id: 2
   };
+
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
 
   it('can get all networks', async () => {
     const server = new Hapi.Server();
