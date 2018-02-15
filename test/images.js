@@ -10,7 +10,7 @@ const CloudApi = require('../lib/cloudapi');
 
 
 const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
+const { describe, it, afterEach } = lab;
 
 
 describe('images', () => {
@@ -39,6 +39,10 @@ describe('images', () => {
     public: true,
     state: 'active'
   };
+
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
 
   it('can get all images', async () => {
     const server = new Hapi.Server();

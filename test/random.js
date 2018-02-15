@@ -10,10 +10,14 @@ const CloudApi = require('../lib/cloudapi');
 
 
 const lab = exports.lab = Lab.script();
-const { describe, it } = lab;
+const { describe, it, afterEach } = lab;
 
 
 describe('random', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
   it('can query for a random machine name', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
