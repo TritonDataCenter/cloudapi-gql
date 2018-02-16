@@ -890,6 +890,8 @@ type Mutation {
   # Arguments
   # id:
   exportImage(
+    # Image id
+    id: ID
     # Manta path prefix used when exporting the image
     manta_path: String!
   ): MantaLocation
@@ -1056,7 +1058,7 @@ type Mutation {
   deleteAllMachineMetadata(
     # Machine id
     id: ID!
-  ): String
+  ): Machine
   # Set tags on the given instance. A pre-existing tag with the same name as one given will be overwritten
   addMachineTags(
     # Machine id
@@ -1148,6 +1150,8 @@ type Mutation {
   ): VLAN
   # Create Fabric network
   createNetwork(
+    # The VLAN id
+    vlan: Int!
     # The network name; must be unique
     name: String!
     # Description of this network
@@ -1169,6 +1173,8 @@ type Mutation {
   ): Network
   # Deletes the specified Network. Note that no instances may be provisioned on the Network
   deleteNetwork(
+    # The VLAN id
+    vlan: Int!
     # The network id
     id: ID
   ): Network

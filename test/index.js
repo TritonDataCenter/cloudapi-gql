@@ -27,7 +27,7 @@ it('has a resolver for every query and mutation in the schema', async () => {
     }
 
     for (const field of def.fields) {
-      fields.push(field.name.value)
+      fields.push(field.name.value);
     }
   }
 
@@ -37,6 +37,7 @@ it('has a resolver for every query and mutation in the schema', async () => {
   const paths = server.table().map((route) => {
     return route.path.substr(1);
   });
+
   for (const field of fields) {
     expect(paths).to.contain(field);
   }
