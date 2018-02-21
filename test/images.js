@@ -76,7 +76,7 @@ describe('images', () => {
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
-      payload: { query: `query { image(id: "${image.id}") { name os type } }` }
+      payload: { query: `query { image(id: "${image.id}") { name os type state } }` }
     });
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.image).to.exist();
