@@ -80,6 +80,25 @@ describe('users', () => {
     expect(res.result.data.updateAccount.firstName).to.equal('Boom');
   });
 
+  it('can create a subuser', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      return user;
+    });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: 'mutation { createUser(email: "email", login: "test") { login } }' }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.createUser).to.exist();
+    expect(res.result.data.createUser.login).to.equal(user.login);
+  });
+
   it('can query for a user', async () => {
     const keys = [{
       name: 'test',

@@ -47,6 +47,15 @@ describe('machines', () => {
     package: 'sdc_128'
   };
 
+  const metadata = {
+    foo: 'bar',
+    group: 'test',
+    credentials: {
+      root: 'boo',
+      admin: 'boo'
+    }
+  };
+
   it('can get all machines', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
@@ -83,6 +92,213 @@ describe('machines', () => {
     expect(res.result.data.machine.id).to.equal(machine.id);
     expect(res.result.data.machine.name).to.equal(machine.name);
   });
+
+  it('can get a machines metadata', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return machine;
+      }
+
+      return metadata;
+    }, { stopAfter: 2 });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machine(id: "${machine.id}") { id name brand state metadata { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machine.id).to.equal(machine.id);
+    expect(res.result.data.machine.name).to.equal(machine.name);
+    expect(res.result.data.machine.metadata[0].name).to.equal(Object.keys(metadata)[0]);
+  });
+
+  it('can get a machines images', async () => {
+    const image = {
+      id: '2b683a82-a066-11e3-97ab-2faa44701c5a',
+      name: 'base',
+      version: '13.4.0',
+      os: 'smartos',
+      requirements: {},
+      type: 'zone-dataset',
+      description: 'A 32-bit SmartOS image with just essential packages installed. Ideal for users who are comfortable with setting up their own environment and tools.',
+      files: [
+        {
+          compression: 'gzip',
+          sha1: '3bebb6ae2cdb26eef20cfb30fdc4a00a059a0b7b',
+          size: 110742036
+        }
+      ],
+      tags: {
+        role: 'os',
+        group: 'base-32'
+      },
+      homepage: 'https://docs.joyent.com/images/smartos/base',
+      published_at: '2014-02-28T10:50:42Z',
+      owner: '930896af-bf8c-48d4-885c-6573a94b1853',
+      public: true,
+      state: 'active'
+    };
+
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return machine;
+      }
+
+      return image;
+    }, { stopAfter: 3 });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machine(id: "${machine.id}") { id name image { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machine.id).to.equal(machine.id);
+    expect(res.result.data.machine.name).to.equal(machine.name);
+    expect(res.result.data.machine.image.name).to.equal(image.name);
+  });
+
+  it('can get a machines networks', async () => {
+    const network = {
+      id: '7326787b-8039-436c-a533-5038f7280f04',
+      name: 'default',
+      public: false,
+      fabric: true,
+      gateway: '192.168.128.1',
+      internet_nat: true,
+      provision_end_ip: '192.168.131.250',
+      provision_start_ip: '192.168.128.5',
+      resolvers: [
+        '8.8.8.8',
+        '8.8.4.4'
+      ],
+      subnet: '192.168.128.0/22',
+      vlan_id: 2
+    };
+
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return machine;
+      }
+
+      return network;
+    }, { stopAfter: 3 });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machine(id: "${machine.id}") { id name networks { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machine.id).to.equal(machine.id);
+    expect(res.result.data.machine.name).to.equal(machine.name);
+    expect(res.result.data.machine.networks[0].name).to.equal(network.name);
+  });
+
+  it('can get a machines snapshots', async () => {
+    const snapshot = {
+      name: 'just-booted',
+      state: 'queued',
+      created: '2011-07-05T17:19:26+00:00',
+      updated: '2011-07-05T17:19:26+00:00'
+    };
+
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return machine;
+      }
+
+      return [snapshot];
+    }, { stopAfter: 2 });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machine(id: "${machine.id}") { id name snapshots { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machine.id).to.equal(machine.id);
+    expect(res.result.data.machine.name).to.equal(machine.name);
+    expect(res.result.data.machine.snapshots[0].name).to.equal(snapshot.name);
+  });
+
+  it('can get a machines firewall rules', async () => {
+    const firewallRule = {
+      id: '38de17c4-39e8-48c7-a168-0f58083de860',
+      rule: 'FROM vm 3d51f2d5-46f2-4da5-bb04-3238f2f64768 TO subnet 10.99.99.0/24 BLOCK tcp PORT 25',
+      enabled: true,
+      description: 'test'
+    };
+
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return machine;
+      }
+
+      return [firewallRule];
+    }, { stopAfter: 2 });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machine(id: "${machine.id}") { id name firewall_rules { rule_str } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machine.id).to.equal(machine.id);
+    expect(res.result.data.machine.name).to.equal(machine.name);
+    expect(res.result.data.machine.firewall_rules[0].rule_str).to.equal(firewallRule.rule);
+  });
+
+  it('can get a machines actions', async () => {
+    const audit = {
+      success: 'yes',
+      time: '2013-02-22T15:19:32.522Z',
+      action: 'provision',
+      caller: {
+        type: 'signature',
+        ip: '127.0.0.1',
+        keyId: '/:login/keys/:fingerprint'
+      }
+    };
+
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return machine;
+      }
+
+      return [audit];
+    }, { stopAfter: 2 });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machine(id: "${machine.id}") { id name actions { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machine.id).to.equal(machine.id);
+    expect(res.result.data.machine.name).to.equal(machine.name);
+    expect(res.result.data.machine.actions[0].name).to.equal(audit.action);
+  });
+
 
   it('can stop a machine', async () => {
     const server = new Hapi.Server();
@@ -223,15 +439,6 @@ describe('machines', () => {
   });
 
   describe('metadata', () => {
-    const metadata = {
-      foo: 'bar',
-      group: 'test',
-      credentials: {
-        root: 'boo',
-        admin: 'boo'
-      }
-    };
-
     it('can get all machine metadata', async () => {
       const server = new Hapi.Server();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {

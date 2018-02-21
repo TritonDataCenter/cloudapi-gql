@@ -1132,7 +1132,7 @@ type Mutation {
     # A unique name to identify the VLAN
     name: String!
     # An optional description of the VLAN
-    descritpion: String
+    description: String
   ): VLAN
   # Updates a fabric VLAN
   updateVLAN(
@@ -1141,7 +1141,7 @@ type Mutation {
     # A unique name to identify the VLAN
     name: String
     # An optional description of the VLAN
-    descritpion: String
+    description: String
   ): VLAN
   # Deletes the specified VLAN. Note there must be no networks on that VLAN in order for the VLAN to be deleted.
   deleteVLAN(
