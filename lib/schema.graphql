@@ -919,9 +919,9 @@ type Mutation {
     # Image id
     id: ID!
     # The name of the custom image, e.g. "my-image"
-    name: String!
+    name: String
     # The version of the custom image, e.g. "1.0.0"
-    version: String!
+    version: String
     # The image description
     description: String
     # The image homepage
