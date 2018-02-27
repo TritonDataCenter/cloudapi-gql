@@ -59,7 +59,7 @@ describe('machines', () => {
   it('can get all machines', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
-      return [machine];
+      return { payload: [machine], res: { headers: { 'x-resource-count': 10 }} };
     });
 
     await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
@@ -67,12 +67,36 @@ describe('machines', () => {
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
-      payload: { query: 'query { machines { id name } }' }
+      payload: { query: 'query { machines { offset total results { id name } } }' }
     });
     expect(res.statusCode).to.equal(200);
-    expect(res.result.data.machines.length).to.equal(1);
-    expect(res.result.data.machines[0].id).to.equal(machine.id);
-    expect(res.result.data.machines[0].name).to.equal(machine.name);
+    expect(res.result.data.machines.total).to.equal(10);
+    expect(res.result.data.machines.offset).to.equal(0);
+    expect(res.result.data.machines.results.length).to.equal(1);
+    expect(res.result.data.machines.results[0].id).to.equal(machine.id);
+    expect(res.result.data.machines.results[0].name).to.equal(machine.name);
+  });
+
+  it('can get all machines with paging', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return { payload: [machine, machine], res: { headers: { 'x-resource-count': 10 }} };
+    });
+
+    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: 'query { machines(offset: 1 limit: 2) { offset limit total results { id name } } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machines.total).to.equal(10);
+    expect(res.result.data.machines.offset).to.equal(1);
+    expect(res.result.data.machines.limit).to.equal(2);
+    expect(res.result.data.machines.results.length).to.equal(2);
+    expect(res.result.data.machines.results[0].id).to.equal(machine.id);
+    expect(res.result.data.machines.results[0].name).to.equal(machine.name);
   });
 
   it('can get a machine', async () => {
