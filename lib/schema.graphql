@@ -19,6 +19,12 @@ type MantaLocation {
   manifest_path: String
 }
 
+interface Page {
+  offset: Int
+  limit: Int
+  total: Int
+}
+
 # todo: get source for this
 enum NicState {
   PROVISIONING
@@ -233,6 +239,13 @@ type Machine {
   ): [Snapshot]
   # Provides a list of an instance's accomplished actions. Results are sorted from newest to oldest action
   actions: [Action]
+}
+
+type MachinePage implements Page {
+  total: Int
+  offset: Int
+  limit: Int
+  results: [Machine]
 }
 
 type Package {
@@ -632,7 +645,7 @@ type Query {
     credentials: Boolean
     # An arbitrary set of tags can be used for querying
     tags: [KeyValueInput]
-  ): [Machine]
+  ): MachinePage
   # Gets the details for an individual instance. Deleted instances are returned only if the instance history has not been purged from Triton
   machine(
     # The id of for this machine
