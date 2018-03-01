@@ -18,8 +18,7 @@ const {
   SDC_ACCOUNT,
   SDC_KEY_ID,
   SDC_URL,
-  BASE_URL = 'http://0.0.0.0:4000',
-  NODE_ENV
+  BASE_URL = 'http://0.0.0.0:4000'
 } = process.env;
 
 const start = async () => {
