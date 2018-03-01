@@ -14,6 +14,19 @@ const { describe, it, afterEach } = lab;
 
 
 describe('machines', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   const network = {
     id: '7326787b-8039-436c-a533-5038f7280f04',
     name: 'default',
@@ -60,10 +73,6 @@ describe('machines', () => {
     package: 'sdc_128'
   };
 
-  afterEach(() => {
-    StandIn.restoreAll();
-  });
-
   it('can get a single network', async () => {
     const server = new Hapi.Server();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
@@ -74,7 +83,7 @@ describe('machines', () => {
       return [machine];
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -94,7 +103,7 @@ describe('machines', () => {
       return [network];
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -118,7 +127,7 @@ describe('machines', () => {
       return vlan;
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
