@@ -4,6 +4,7 @@
 // SDC_URL, SDC_KEY_ID, SDC_KEY_PATH
 require('./env.js');
 
+const Url = require('url');
 const { renderVoyagerPage } = require('graphql-voyager/middleware');
 const { renderPlaygroundPage } = require('graphql-playground-html');
 const Hapi = require('hapi');
@@ -18,10 +19,12 @@ const {
   SDC_ACCOUNT,
   SDC_KEY_ID,
   SDC_URL,
-  BASE_URL = 'http://0.0.0.0:4000'
+  BASE_URL = 'http://0.0.0.0:4000',
+  DC_NAME
 } = process.env;
 
 const start = async () => {
+  const dcName = DC_NAME || Url.parse(SDC_URL).host.split('.')[0];
   const server = Hapi.server({
     port: 4000,
     routes: {
@@ -80,7 +83,8 @@ const start = async () => {
           authStrategy: 'sso',
           keyPath: SDC_KEY_PATH,
           keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
-          apiBaseUrl: SDC_URL
+          apiBaseUrl: SDC_URL,
+          dcName
         }
       }
     ]);

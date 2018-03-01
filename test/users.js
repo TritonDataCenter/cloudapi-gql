@@ -14,6 +14,19 @@ const { describe, it, afterEach } = lab;
 
 
 describe('users', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   const user = {
     id: '4fc13ac6-1e7d-cd79-f3d2-96276af0d638',
     login: 'barbar',
@@ -25,10 +38,6 @@ describe('users', () => {
     updated: '2015-12-23T06:41:11.032Z',
     created: '2015-12-23T06:41:11.032Z'
   };
-
-  afterEach(() => {
-    StandIn.restoreAll();
-  });
 
   it('can get your account', async () => {
     const key = {
@@ -46,7 +55,7 @@ describe('users', () => {
       return key;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -66,7 +75,7 @@ describe('users', () => {
       return user;
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -86,7 +95,7 @@ describe('users', () => {
       return user;
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -115,7 +124,7 @@ describe('users', () => {
       return keys;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -134,7 +143,7 @@ describe('users', () => {
       return [user];
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',

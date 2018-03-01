@@ -18,6 +18,15 @@ describe('machines', () => {
     StandIn.restoreAll();
   });
 
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   const machine = {
     id: 'b6979942-7d5d-4fe6-a2ec-b812e950625a',
     name: 'test',
@@ -62,7 +71,7 @@ describe('machines', () => {
       return { payload: [machine], res: { headers: { 'x-resource-count': 10 }} };
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -83,7 +92,7 @@ describe('machines', () => {
       return { payload: [machine, machine], res: { headers: { 'x-resource-count': 10 }} };
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -105,7 +114,7 @@ describe('machines', () => {
       return machine;
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -127,7 +136,7 @@ describe('machines', () => {
       return metadata;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -176,7 +185,7 @@ describe('machines', () => {
       return image;
     }, { stopAfter: 3 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -216,7 +225,7 @@ describe('machines', () => {
       return network;
     }, { stopAfter: 3 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -246,7 +255,7 @@ describe('machines', () => {
       return [snapshot];
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -276,7 +285,7 @@ describe('machines', () => {
       return [firewallRule];
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -310,7 +319,7 @@ describe('machines', () => {
       return [audit];
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -331,7 +340,7 @@ describe('machines', () => {
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -351,7 +360,7 @@ describe('machines', () => {
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -371,7 +380,7 @@ describe('machines', () => {
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -408,7 +417,7 @@ describe('machines', () => {
       return packageObj;
     }, { stopAfter: 3 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -430,7 +439,7 @@ describe('machines', () => {
         return result;
       }, { stopAfter: 2 });
 
-      await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+      await server.register(register);
       await server.initialize();
       const res = await server.inject({
         url: '/graphql',
@@ -449,7 +458,7 @@ describe('machines', () => {
         return result;
       }, { stopAfter: 2 });
 
-      await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+      await server.register(register);
       await server.initialize();
       const res = await server.inject({
         url: '/graphql',
@@ -469,7 +478,7 @@ describe('machines', () => {
         return metadata;
       });
 
-      await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+      await server.register(register);
       await server.initialize();
       const res = await server.inject({
         url: '/graphql',
@@ -487,7 +496,7 @@ describe('machines', () => {
         return 'bar';
       });
 
-      await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+      await server.register(register);
       await server.initialize();
       const res = await server.inject({
         url: '/graphql',

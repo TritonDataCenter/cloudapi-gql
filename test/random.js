@@ -18,13 +18,22 @@ describe('random', () => {
     StandIn.restoreAll();
   });
 
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   it('can query for a random machine name', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return [];
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -41,7 +50,7 @@ describe('random', () => {
       return [];
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',

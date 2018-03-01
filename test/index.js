@@ -13,9 +13,18 @@ const lab = exports.lab = Lab.script();
 const it = lab.it;
 
 
+const register = {
+  plugin: CloudApiGql,
+  options: {
+    keyPath: Path.join(__dirname, 'test.key'),
+    keyId: 'test',
+    apiBaseUrl: 'http://localhost'
+  }
+};
+
 it('can be registered with hapi', async () => {
   const server = new Hapi.Server();
-  await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+  await server.register(register);
 });
 
 it('has a resolver for every query and mutation in the schema', async () => {
@@ -32,7 +41,7 @@ it('has a resolver for every query and mutation in the schema', async () => {
   }
 
   const server = new Hapi.Server();
-  await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+  await server.register(register);
   await server.initialize();
   const paths = server.table().map((route) => {
     return route.path.substr(1);

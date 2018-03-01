@@ -14,6 +14,19 @@ const { describe, it, afterEach } = lab;
 
 
 describe('images', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   const image = {
     id: '2b683a82-a066-11e3-97ab-2faa44701c5a',
     name: 'base',
@@ -40,17 +53,13 @@ describe('images', () => {
     state: 'active'
   };
 
-  afterEach(() => {
-    StandIn.restoreAll();
-  });
-
   it('can get all images', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return [image];
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -71,7 +80,7 @@ describe('images', () => {
       return image;
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -91,7 +100,7 @@ describe('images', () => {
       return image;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -115,7 +124,7 @@ describe('images', () => {
       return image;
     }, { stopAfter: 2 });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',

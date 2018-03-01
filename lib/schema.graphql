@@ -561,6 +561,8 @@ type Query {
   ): Policy
   # Outputs configuration for your account
   config: [KeyValue]
+  # Retrieve either a datacenter by name, or omit the name and retrieve the current
+  datacenter(name: String): Datacenter
   # Provides a list of all datacenters this cloud is aware of
   datacenters: [Datacenter]
   # Provides a list of available products in this datacenter

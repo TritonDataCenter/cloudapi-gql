@@ -14,6 +14,19 @@ const { describe, it, afterEach } = lab;
 
 
 describe('packages', () => {
+  afterEach(() => {
+    StandIn.restoreAll();
+  });
+
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   const packageObj = {
     id: '7b17343c-94af-6266-e0e8-893a3b9993d0',
     name: 'sdc_128',
@@ -26,17 +39,13 @@ describe('packages', () => {
     version: '1.0.0'
   };
 
-  afterEach(() => {
-    StandIn.restoreAll();
-  });
-
   it('can get all packages', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return [packageObj];
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
@@ -55,7 +64,7 @@ describe('packages', () => {
       return packageObj;
     });
 
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',

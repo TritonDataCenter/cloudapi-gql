@@ -19,6 +19,15 @@ describe('config', () => {
     StandIn.restoreAll();
   });
 
+  const register = {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
+  };
+
   it('can get all configs', async () => {
     const config = {
       default_network: '45607081-4cd2-45c8-baf7-79da760fffaa'
@@ -30,7 +39,7 @@ describe('config', () => {
     });
 
     const query = QueryString.stringify({ query: 'query { config { name value } }' });
-    await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
+    await server.register(register);
     await server.initialize();
     const res = await server.inject({
       url: `/graphql?${query}`
