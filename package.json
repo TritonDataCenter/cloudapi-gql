@@ -21,7 +21,6 @@
     "force-array": "3.1.x",
     "fwrule": "1.4.x",
     "graphi": "5.x.x",
-    "graphql-tools": "2.21.x",
     "hasha": "3.0.x",
     "lodash.uniq": "4.5.x",
     "sentiment": "4.2.x",
@@ -37,7 +36,7 @@
     "hapi": "17.x.x",
     "inert": "5.x.x",
     "lab": "15.x.x",
-    "hapi-triton-auth": "1.x.x",
+    "hapi-triton-auth": "2.x.x",
     "stand-in": "4.x.x"
   }
 }
