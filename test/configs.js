@@ -1,6 +1,7 @@
 'use strict';
 
 const Path = require('path');
+const QueryString = require('querystring');
 const { expect } = require('code');
 const Hapi = require('hapi');
 const Lab = require('lab');
@@ -28,13 +29,13 @@ describe('config', () => {
       return config;
     });
 
+    const query = QueryString.stringify({ query: 'query { config { name value } }' });
     await server.register({ plugin: CloudApiGql, options: { keyPath: Path.join(__dirname, 'test.key') } });
     await server.initialize();
     const res = await server.inject({
-      url: '/graphql',
-      method: 'post',
-      payload: { query: 'query { config { name value } }' }
+      url: `/graphql?${query}`
     });
+
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.config).to.exist();
     expect(res.result.data.config[0].name).to.equal('default_network');
