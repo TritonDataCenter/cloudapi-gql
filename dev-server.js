@@ -59,21 +59,19 @@ const start = async () => {
       {
         plugin: Sso,
         options: {
+          keyPath: SDC_KEY_PATH,
+          keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
+          apiBaseUrl: SDC_URL,
+          ssoUrl: 'https://sso.joyent.com/login',
+          permissions: { 'cloudapi': ['/my/*'] },
+          baseUrl: BASE_URL,
+          isDev: true,
           cookie: {
             password: COOKIE_PASSWORD,
             domain: COOKIE_DOMAIN,
             isSecure: false,
             isHttpOnly: true,
             ttl: 1000 * 60 * 60       // 1 hour
-          },
-          sso: {
-            keyPath: SDC_KEY_PATH,
-            keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
-            apiBaseUrl: SDC_URL,
-            url: 'https://sso.joyent.com/login',
-            permissions: { 'cloudapi': ['/my/*'] },
-            baseUrl: BASE_URL,
-            isDev: NODE_ENV === 'development'
           }
         }
       },
