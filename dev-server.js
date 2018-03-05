@@ -31,7 +31,7 @@ const start = async () => {
       cors: {
         origin: ['*'],
         credentials: true,
-        additionalHeaders: ['Cookie']
+        additionalHeaders: ['Cookie', 'X-CSRF-Token']
       }
     },
     debug: {
