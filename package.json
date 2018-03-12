@@ -1,6 +1,6 @@
 {
   "name": "cloudapi-gql",
-  "version": "7.1.1",
+  "version": "7.1.2",
   "license": "MPL-2.0",
   "repository": "github:joyent/cloudapi-gql",
   "main": "lib",
