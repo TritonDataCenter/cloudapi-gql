@@ -34,9 +34,9 @@
     "graphql-playground-html": "1.x.x",
     "graphql-voyager": "1.0.0-rc.15",
     "hapi": "17.x.x",
+    "hapi-triton-auth": "2.x.x",
     "inert": "5.x.x",
     "lab": "15.x.x",
-    "hapi-triton-auth": "2.x.x",
     "stand-in": "4.x.x"
   }
 }
