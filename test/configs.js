@@ -25,6 +25,9 @@ describe('config', () => {
       keyPath: Path.join(__dirname, 'test.key'),
       keyId: 'test',
       apiBaseUrl: 'http://localhost'
+    },
+    routes: {
+      prefix: '/test'
     }
   };
 
@@ -42,7 +45,7 @@ describe('config', () => {
     await server.register(register);
     await server.initialize();
     const res = await server.inject({
-      url: `/graphql?${query}`
+      url: `/test/graphql?${query}`
     });
 
     expect(res.statusCode).to.equal(200);
