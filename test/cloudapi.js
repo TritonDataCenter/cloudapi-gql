@@ -6,7 +6,7 @@ const Path = require('path');
 const { expect } = require('code');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApi = require('cloudapi-client');
+const CloudApi = require('webconsole-cloudapi-client');
 
 
 const lab = exports.lab = Lab.script();
