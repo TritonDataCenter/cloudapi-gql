@@ -6,7 +6,7 @@ const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
-const CloudApi = require('cloudapi-client');
+const CloudApi = require('webconsole-cloudapi-client');
 
 
 const lab = exports.lab = Lab.script();
