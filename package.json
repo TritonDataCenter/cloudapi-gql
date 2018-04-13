@@ -12,20 +12,20 @@
     "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
     "lint": "belly-button --fix",
     "pretest": "npm run lint",
-    "test": "lab -t 76 --coverage-path lib -a code"
+    "test": "lab -t 79 --coverage-path lib -a code"
   },
   "dependencies": {
-    "apr-map": "3.x.x",
-    "boom": "7.x.x",
-    "bounce": "1.x.x",
-    "webconsole-cloudapi-client": "1.x.x",
+    "apr-map": "3.0.x",
+    "boom": "7.2.x",
+    "bounce": "1.2.x",
+    "webconsole-cloudapi-client": "1.0.x",
     "force-array": "3.1.x",
-    "fwrule": "2.x.x",
-    "graphi": "5.x.x",
+    "fwrule": "2.0.x",
+    "graphi": "5.6.x",
     "hasha": "3.0.x",
     "lodash.uniq": "4.5.x",
     "sentiment": "4.2.x",
-    "wreck": "14.x.x"
+    "wreck": "14.0.x"
   },
   "devDependencies": {
     "@2fd/graphdoc": "2.x.x",
