@@ -327,10 +327,11 @@ type ImageFile {
 
 # Brands are related to the type of virtualization used among other factors
 enum Brand {
+  BHYVE
   JOYENT
   JOYENT_MINIMAL
-  LX
   KVM
+  LX
 }
 
 # A grouping of various requirements for provisioning a VM with this image
