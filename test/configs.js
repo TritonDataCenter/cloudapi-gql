@@ -53,4 +53,33 @@ describe('config', () => {
     expect(res.result.data.config[0].name).to.equal('default_network');
     expect(res.result.data.config[0].value).to.equal('45607081-4cd2-45c8-baf7-79da760fffaa');
   });
+
+  it('can update a config', async () => {
+    const config = {
+      default_network: '45607081-4cd2-45c8-baf7-79da760fffaa'
+    };
+
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return config;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/test/graphql',
+      method: 'post',
+      payload: {
+        query: `mutation {
+        updateConfig(
+          default_network: "45607081-4cd2-45c8-baf7-79da760fffaa"
+        ) { id name value } }`
+      }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.updateConfig).to.exist();
+    expect(res.result.data.updateConfig[0].name).to.equal('default_network');
+    expect(res.result.data.updateConfig[0].value).to.equal('45607081-4cd2-45c8-baf7-79da760fffaa');
+  });
 });

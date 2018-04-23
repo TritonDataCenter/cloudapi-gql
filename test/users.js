@@ -154,4 +154,82 @@ describe('users', () => {
     expect(res.result.data.users).to.exist();
     expect(res.result.data.users[0].login).to.equal(user.login);
   });
+
+  it('can query for users with users(id)', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return user;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { users(id: "${user.id}" ) { login } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.users).to.exist();
+    expect(res.result.data.users[0].login).to.equal(user.login);
+  });
+
+  it('can update user', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      const updatedUser = Object.assign({}, user);
+      updatedUser.email = options.payload.email;
+      return updatedUser;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { updateUser(id: "${user.id}", email: "dumbo@test.com" ) { id email } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.updateUser).to.exist();
+    expect(res.result.data.updateUser.email).to.equal('dumbo@test.com');
+  });
+
+  it('can change user password', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      expect(path).to.equal(`/users/${user.id}/change_password`);
+      return user;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { changeUserPassword(id: "${user.id}", password: "password1", password_confirmation: "password1" ) { id email } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.changeUserPassword).to.exist();
+    expect(res.result.data.changeUserPassword.email).to.equal(user.email);
+  });
+
+  it('can delete a user', async () => {
+    const server = new Hapi.Server();
+    let fetchPath = '';
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
+      fetchPath = path;
+      return user;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { deleteUser(id: "${user.id}") { id email } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.deleteUser).to.exist();
+    expect(res.result.data.deleteUser.email).to.equal(user.email);
+    expect(fetchPath).to.equal(`/users/${user.id}`);
+  });
 });

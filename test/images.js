@@ -73,6 +73,25 @@ describe('images', () => {
     expect(res.result.data.images[0].type).to.equal(image.type.toUpperCase().replace('-', '_'));
   });
 
+  it('can get all images filtered by id', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return image;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { images(id: "${image.id}") { name os type } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.images).to.exist();
+    expect(res.result.data.images[0].name).to.equal(image.name);
+    expect(res.result.data.images[0].os).to.equal(image.os.toUpperCase());
+    expect(res.result.data.images[0].type).to.equal(image.type.toUpperCase().replace('-', '_'));
+  });
 
   it('can get a single image', async () => {
     const server = new Hapi.Server();
@@ -92,6 +111,24 @@ describe('images', () => {
     expect(res.result.data.image.name).to.equal(image.name);
     expect(res.result.data.image.os).to.equal(image.os.toUpperCase());
     expect(res.result.data.image.type).to.equal(image.type.toUpperCase().replace('-', '_'));
+  });
+
+  it('can return error when fetch throws an exception', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
+      throw Error('it blowed up');
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { image(id: "${image.id}") { name os type state } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.errors).to.exist();
+    expect(res.result.data.image).to.not.exist();
   });
 
   it('can create an image from a machine', async () => {
@@ -140,5 +177,60 @@ describe('images', () => {
     expect(res.result.data.updateImage.name).to.equal(image.name);
     expect(res.result.data.updateImage.os).to.equal(image.os.toUpperCase());
     expect(res.result.data.updateImage.type).to.equal(image.type.toUpperCase().replace('-', '_'));
+  });
+
+  it('can delete an image', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      return image;
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: {
+        query: `mutation {
+        deleteImage(id: "${image.id}") {
+          name os type version
+        }
+      }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.deleteImage).to.exist();
+    expect(res.result.data.deleteImage.name).to.equal(image.name);
+    expect(res.result.data.deleteImage.os).to.equal(image.os.toUpperCase());
+    expect(res.result.data.deleteImage.type).to.equal(image.type.toUpperCase().replace('-', '_'));
+  });
+
+  it('can export an image', async () => {
+    const mantaLocation = {
+      'manta_url': 'https://us-east.manta.joyent.com',
+      'image_path': '/test.user/stor/test-image',
+      'manifest_path': '/test.user/stor/test-image.imgmanifest'
+    };
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      return mantaLocation;
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: {
+        query: `mutation {
+        exportImage(id: "${image.id}", manta_path: "/test.user/stor/test-image") {
+          manta_url image_path manifest_path
+        }
+      }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.exportImage).to.exist();
+    expect(res.result.data.exportImage.manta_url).to.equal(mantaLocation.manta_url);
+    expect(res.result.data.exportImage.image_path).to.equal(mantaLocation.image_path);
+    expect(res.result.data.exportImage.manifest_path).to.equal(mantaLocation.manifest_path);
   });
 });

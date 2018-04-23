@@ -40,7 +40,7 @@ describe('machines', () => {
     ],
     memory: 128,
     disk: 12288,
-    metadata: {
+    metadata2: {
       root_authorized_keys: '...'
     },
     tags: {},
@@ -57,7 +57,7 @@ describe('machines', () => {
   };
 
   const metadata = {
-    foo: 'bar',
+    root_authorized_keys: '...',
     group: 'test',
     credentials: {
       root: 'boo',
@@ -80,6 +80,48 @@ describe('machines', () => {
     });
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.machines.total).to.equal(10);
+    expect(res.result.data.machines.offset).to.equal(0);
+    expect(res.result.data.machines.results.length).to.equal(1);
+    expect(res.result.data.machines.results[0].id).to.equal(machine.id);
+    expect(res.result.data.machines.results[0].name).to.equal(machine.name);
+  });
+
+  it('can get a machine using machines(id)', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      return machine;
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machines(id: "${machine.id}" ) { offset total results { id name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.machines.offset).to.equal(0);
+    expect(res.result.data.machines.results.length).to.equal(1);
+    expect(res.result.data.machines.results[0].id).to.equal(machine.id);
+    expect(res.result.data.machines.results[0].name).to.equal(machine.name);
+  });
+
+  it('can get machines using machines(brand, state)', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      expect(options.query.brand).to.equal('joyent');
+      expect(options.query.state).to.equal('running');
+      return { payload: [machine], res: { headers: { 'x-resource-count': 10 } } };
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { machines(brand: ${machine.brand.toUpperCase()}, state: ${machine.state.toUpperCase()} ) { offset total results { id name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
     expect(res.result.data.machines.offset).to.equal(0);
     expect(res.result.data.machines.results.length).to.equal(1);
     expect(res.result.data.machines.results[0].id).to.equal(machine.id);
@@ -336,7 +378,6 @@ describe('machines', () => {
     expect(res.result.data.machine.actions[0].name).to.equal(audit.action);
   });
 
-
   it('can stop a machine', async () => {
     const server = new Hapi.Server();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path) => {
@@ -395,6 +436,67 @@ describe('machines', () => {
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.rebootMachine.id).to.equal(machine.id);
     expect(res.result.data.rebootMachine.state).to.equal('STOPPING');
+  });
+
+  it('can rename a machine', async () => {
+    const server = new Hapi.Server();
+    const updatedMachine = Object.assign({}, machine);
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      if (options && options.query) {
+        updatedMachine.name = options.query.name;
+      }
+      return updatedMachine;
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { renameMachine(id: "${machine.id}", name: "bacon-server") { id name } }` }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.renameMachine.id).to.equal(machine.id);
+    expect(res.result.data.renameMachine.name).to.equal('bacon-server');
+  });
+
+  it('can create a machine', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      return machine;
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { createMachine(name: "${machine.name}", package: "${machine.package}", image: "${machine.image}" ) { id name } }` }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.createMachine.id).to.equal(machine.id);
+    expect(res.result.data.createMachine.name).to.equal(machine.name);
+  });
+
+  it('can delete a machine', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      return machine;
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { deleteMachine(id: "${machine.id}") { id name } }` }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.deleteMachine.id).to.equal(machine.id);
+    expect(res.result.data.deleteMachine.name).to.equal(machine.name);
   });
 
   it('can resize a machine', async () => {
@@ -491,7 +593,26 @@ describe('machines', () => {
       });
       expect(res.statusCode).to.equal(200);
       expect(res.result.data.metadata.length).to.equal(3);
-      expect(res.result.data.metadata[0].name).to.equal('foo');
+      expect(res.result.data.metadata[0].name).to.equal('root_authorized_keys');
+    });
+
+    it('can get an individual metadata value using metadata(name)', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return 'crispy';
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { metadata(machine: "${machine.id}", name: "bacon") { name value } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.metadata.length).to.equal(1);
+      expect(res.result.data.metadata[0].name).to.equal('bacon');
+      expect(res.result.data.metadata[0].value).to.equal('crispy');
     });
 
     it('can get an individual metadata value', async () => {
@@ -510,6 +631,498 @@ describe('machines', () => {
       expect(res.statusCode).to.equal(200);
       expect(res.result.data.metadataValue.name).to.equal('foo');
       expect(res.result.data.metadataValue.value).to.equal('bar');
+    });
+
+    it('can update machine metadata', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+        if (stand.invocations === 1) {
+          return { bacon: 'crispy' };
+        }
+        if (stand.invocations === 2) {
+          return Object.assign({}, machine, { metadata: { bacon: 'crispy' } });
+        }
+        if (stand.invocations === 3) {
+          return { bacon: 'crispy' };
+        }
+      }, { stopAfter: 3 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { 
+          updateMachineMetadata(
+            id: "${machine.id}", 
+            metadata: [ { name: "bacon", value: "crispy" } ]
+          ) 
+          { id metadata { name value } }
+        }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.updateMachineMetadata).to.exist();
+      expect(res.result.data.updateMachineMetadata.metadata.length).to.equal(1);
+      expect(res.result.data.updateMachineMetadata.metadata[0].name).to.equal('bacon');
+      expect(res.result.data.updateMachineMetadata.metadata[0].value).to.equal('crispy');
+    });
+
+    it('can delete machine metadata', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+        if (stand.invocations === 1) {
+          return {};
+        }
+        if (stand.invocations === 2) {
+          return Object.assign({}, machine, { metadata: {} });
+        }
+        if (stand.invocations === 3) {
+          return {};
+        }
+      }, { stopAfter: 2 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: {
+          query: `mutation { 
+          deleteMachineMetadata(
+            id: "${machine.id}", 
+            name: "root_authorized_keys"
+          ) 
+          { id metadata { name value } }
+        }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.deleteMachineMetadata).to.exist();
+      expect(res.result.data.deleteMachineMetadata.metadata.length).to.equal(0);
+    });
+
+    it('can delete all machine metadata', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+        if (stand.invocations === 1) {
+          return {};
+        }
+        if (stand.invocations === 2) {
+          return Object.assign({}, machine, { metadata: {} });
+        }
+        if (stand.invocations === 3) {
+          return {};
+        }
+      }, { stopAfter: 2 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: {
+          query: `mutation { 
+          deleteAllMachineMetadata(
+            id: "${machine.id}"
+          ) 
+          { id metadata { name value } }
+        }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.deleteAllMachineMetadata).to.exist();
+      expect(res.result.data.deleteAllMachineMetadata.metadata.length).to.equal(0);
+    });
+  });
+
+  describe('nics', () => {
+    const nics = [{
+      mac: '86:75:30:99:99:99',
+      primary: true,
+      ip: '10.88.88.137',
+      netmask: '255.255.255.0',
+      gateway: '10.88.88.2',
+      state: 'running',
+      network: '6b3229b6-c535-11e5-8cf9-c3a24fa96e35'
+    }, {
+      mac: '90:b8:d0:2f:b8:f9',
+      primary: false,
+      ip: '10.88.81.33',
+      netmask: '255.255.255.0',
+      gateway: '10.88.81.2',
+      state: 'running',
+      network: '6b3229b6-c535-11e5-8cf9-c3a24fa96e35'
+    }];
+
+    it('can get all the nics for a machine', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return nics;
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { nics(machine: "${machine.id}") { mac primary ip } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.nics.length).to.equal(2);
+      expect(res.result.data.nics[0].mac).to.exist().and.to.equal('86:75:30:99:99:99');
+      expect(res.result.data.nics[0].primary).to.exist().and.to.equal(true);
+      expect(res.result.data.nics[0].ip).to.exist().and.to.equal('10.88.88.137');
+    });
+
+    it('can get a nic for a machine using nics(machine, mac)', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return nics[0];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { nics(machine: "${machine.id}", mac: "${nics[0].mac}") { mac primary ip } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.nics.length).to.equal(1);
+      expect(res.result.data.nics[0].mac).to.exist().and.to.equal('86:75:30:99:99:99');
+      expect(res.result.data.nics[0].primary).to.exist().and.to.equal(true);
+      expect(res.result.data.nics[0].ip).to.exist().and.to.equal('10.88.88.137');
+    });
+
+    it('can get a nic', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return nics[0];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { nic(machine: "${machine.id}", mac: "${nics[0].mac}") { mac primary ip } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.nic).to.exist();
+      expect(res.result.data.nic.mac).to.exist().and.to.equal('86:75:30:99:99:99');
+      expect(res.result.data.nic.primary).to.exist().and.to.equal(true);
+      expect(res.result.data.nic.ip).to.exist().and.to.equal('10.88.88.137');
+    });
+
+    it('can add a nic', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return nics[0];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { addNic(machine: "${machine.id}", network: "${nics[0].network}") { mac primary ip } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.addNic).to.exist();
+      expect(res.result.data.addNic.mac).to.exist().and.to.equal('86:75:30:99:99:99');
+      expect(res.result.data.addNic.primary).to.exist().and.to.equal(true);
+      expect(res.result.data.addNic.ip).to.exist().and.to.equal('10.88.88.137');
+    });
+
+    it('can remove a nic', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return nics[0];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { removeNic(machine: "${machine.id}", mac: "${nics[0].mac}") { mac primary ip } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.removeNic).to.exist();
+      expect(res.result.data.removeNic.mac).to.exist().and.to.equal('86:75:30:99:99:99');
+      expect(res.result.data.removeNic.primary).to.exist().and.to.equal(true);
+      expect(res.result.data.removeNic.ip).to.exist().and.to.equal('10.88.88.137');
+    });
+  });
+
+  describe('snapshots', () => {
+    const snapshots = [{
+      name: 'bacon-server',
+      state: 'queued',
+      created: '2011-07-05T17:19:26+00:00',
+      updated: '2011-07-05T17:19:26+00:00'
+    }];
+
+    it('can get all snapshots by machine', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return snapshots;
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { snapshots(machine: "${machine.id}") { name state } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.snapshots.length).to.equal(1);
+      expect(res.result.data.snapshots[0].name).to.equal(snapshots[0].name);
+      expect(res.result.data.snapshots[0].state).to.equal(snapshots[0].state.toUpperCase());
+    });
+
+    it('can get all snapshot by machine and name', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return snapshots[0];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { snapshots(machine: "${machine.id}", name: "${snapshots[0].name}") { name state } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.snapshots.length).to.equal(1);
+      expect(res.result.data.snapshots[0].name).to.equal(snapshots[0].name);
+      expect(res.result.data.snapshots[0].state).to.equal(snapshots[0].state.toUpperCase());
+    });
+
+    it('can create a new snapshot', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return snapshots[0];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { createMachineSnapshot(id: "${machine.id}", name: "${snapshots[0].name}") { name state } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.createMachineSnapshot.name).to.equal(snapshots[0].name);
+      expect(res.result.data.createMachineSnapshot.state).to.equal(snapshots[0].state.toUpperCase());
+    });
+
+    it('can start a machine snapshot', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+        if (stand.invocations === 1) {
+          return '';
+        }
+        return machine;
+      }, { stopAfter: 2 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { startMachineFromSnapshot(id: "${machine.id}", snapshot: "${snapshots[0].name}") { id name } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.startMachineFromSnapshot.id).to.equal(machine.id);
+      expect(res.result.data.startMachineFromSnapshot.name).to.equal(machine.name);
+    });
+
+    it('can delete a machine snapshot', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+        if (stand.invocations === 1) {
+          return '';
+        }
+        return machine;
+      }, { stopAfter: 2 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { deleteMachineSnapshot(id: "${machine.id}", snapshot: "${snapshots[0].name}") { id name } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.deleteMachineSnapshot.id).to.equal(machine.id);
+      expect(res.result.data.deleteMachineSnapshot.name).to.equal(machine.name);
+    });
+  });
+
+  describe('tags', () => {
+    const tags = { bacon: 'crispy', nuts: 'salty' };
+    it('can get a list of all tags for a machine', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+        return tags;
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { tags(machine: "${machine.id}") { name, value } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.tags.length).to.equal(2);
+      expect(res.result.data.tags[0].name).to.exist().and.to.equal('bacon');
+      expect(res.result.data.tags[0].value).to.exist().and.to.equal('crispy');
+    });
+
+    it('can get a tag for a machine by name', async () => {
+      const server = new Hapi.Server();
+      StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
+        const name = path.split('/').pop();
+        expect(name).to.equal('bacon');
+        return tags[name];
+      });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `query { tags(machine: "${machine.id}", name: "bacon") { name, value } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.data.tags.length).to.equal(1);
+      expect(res.result.data.tags[0].name).to.exist().and.to.equal('bacon');
+      expect(res.result.data.tags[0].value).to.exist().and.to.equal('crispy');
+    });
+
+    it('can add a tag to a machine', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+        if (stand.invocations === 1) {
+          expect(options.payload.steak).to.equal('medium-rare');
+          return Object.assign({}, tags, options.payload);
+        }
+        if (stand.invocations === 2) {
+          const machineWithTags = Object.assign({}, machine);
+          machineWithTags.tags = Object.assign({}, tags, { steak: 'medium-rare', jenny: '8675309' });
+          return machineWithTags;
+        }
+        return Object.assign({}, tags, { steak: 'medium-rare', jenny: '8675309' });
+      }, { stopAfter: 3 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: { query: `mutation { 
+          addMachineTags(id: "${machine.id}", 
+          tags: [ { name: "steak", value: "medium-rare" }, { name: "jenny", value: "8675309" } ] ) 
+          { id, name, tags { name, value } } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      const result = res.result.data.addMachineTags;
+      expect(result.tags.length).to.equal(4);
+      const steak = result.tags.find((t) => {
+        return t.name === 'steak';
+      });
+      expect(steak.value).to.equal('medium-rare');
+    });
+
+    it('can replace machine tags', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+        if (stand.invocations === 1) {
+          return options.payload;
+        }
+        if (stand.invocations === 2) {
+          return machine;
+        }
+        return { steak: 'medium-rare', jenny: '8675309' };
+      }, { stopAfter: 3 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: {
+          query: `mutation { 
+          replaceMachineTags(id: "${machine.id}", 
+          tags: [ { name: "steak", value: "medium-rare" }, { name: "jenny", value: "8675309" } ] ) 
+          { id, name, tags { name, value } } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      const result = res.result.data.replaceMachineTags;
+      expect(result.tags.length).to.equal(2);
+      const steak = result.tags.find((t) => {
+        return t.name === 'steak';
+      });
+      expect(steak.value).to.equal('medium-rare');
+    });
+
+    it('can delete a machine tag', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+        if (stand.invocations === 1) {
+          return '';
+        }
+        if (stand.invocations === 2) {
+          return machine;
+        }
+        return { bacon: 'crispy' };
+      }, { stopAfter: 3 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: {
+          query: `mutation { 
+          deleteMachineTag(id: "${machine.id}", 
+          name: "nuts" ) 
+          { id, name, tags { name, value } } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      const result = res.result.data.deleteMachineTag;
+      expect(result.tags.length).to.equal(1);
+      expect(result.tags[0].name).to.equal('bacon');
+      expect(result.tags[0].value).to.equal('crispy');
+    });
+
+    it('can delete all machine tags', async () => {
+      const server = new Hapi.Server();
+      StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+        if (stand.invocations === 1) {
+          return '';
+        }
+        if (stand.invocations === 2) {
+          return machine;
+        }
+        return {};
+      }, { stopAfter: 3 });
+
+      await server.register(register);
+      await server.initialize();
+      const res = await server.inject({
+        url: '/graphql',
+        method: 'post',
+        payload: {
+          query: `mutation { 
+          deleteMachineTags(id: "${machine.id}") 
+          { id, name, tags { name, value } } }` }
+      });
+      expect(res.statusCode).to.equal(200);
+      const result = res.result.data.deleteMachineTags;
+      expect(result.tags.length).to.equal(0);
     });
   });
 });
