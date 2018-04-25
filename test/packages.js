@@ -58,7 +58,26 @@ describe('packages', () => {
     expect(res.result.data.packages[0].name).to.equal(packageObj.name);
   });
 
-  it('can get a package', async () => {
+  it('can get all packages filtered by id', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return packageObj;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { packages(id: "${packageObj.id}") { id name } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.packages.length).to.equal(1);
+    expect(res.result.data.packages[0].id).to.equal(packageObj.id);
+    expect(res.result.data.packages[0].name).to.equal(packageObj.name);
+  });
+
+  it('can get a package by id', async () => {
     const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return packageObj;
@@ -70,6 +89,24 @@ describe('packages', () => {
       url: '/graphql',
       method: 'post',
       payload: { query: `query { package(id: "${packageObj.id}") { id name } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.package.id).to.equal(packageObj.id);
+    expect(res.result.data.package.name).to.equal(packageObj.name);
+  });
+
+  it('can get a package by name', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return packageObj;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { package(name: "${packageObj.name}") { id name } }` }
     });
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.package.id).to.equal(packageObj.id);

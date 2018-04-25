@@ -124,6 +124,35 @@ describe('datacenters', () => {
     expect(res.result.data.datacenter.url).to.equal('http://us-west-1.joyent.com');
   });
 
+  it('can get a single datacenter by name with unknown location', async () => {
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
+      return {
+        res: {
+          headers: {
+            Location: 'http://af-west-1.joyent.com'
+          }
+        },
+        payload: {
+          code: 'ResourceMoved',
+          message: 'af-west-1 http://af-west-1.joyent.com'
+        }
+      };
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: 'query { datacenter(name: "af-west-1") { name, place, url } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.datacenter.place).to.equal('Unknown');
+    expect(res.result.data.datacenter.name).to.equal('af-west-1');
+    expect(res.result.data.datacenter.url).to.equal('http://af-west-1.joyent.com');
+  });
+
   it('can get all datacenters', async () => {
     const datacenters = {
       'us-west-1': 'http://test.com'

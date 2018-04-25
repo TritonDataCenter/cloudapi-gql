@@ -12,13 +12,13 @@
     "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
     "lint": "belly-button --fix",
     "pretest": "npm run lint",
-    "test": "lab -t 79 --coverage-path lib -a code"
+    "test": "lab -t 95 --coverage-path lib -a code"
   },
   "dependencies": {
     "apr-map": "3.0.x",
     "boom": "7.2.x",
     "bounce": "1.2.x",
-    "webconsole-cloudapi-client": "1.0.x",
+    "webconsole-cloudapi-client": "1.x.x",
     "force-array": "3.1.x",
     "fwrule": "2.0.x",
     "graphi": "5.6.x",
@@ -37,7 +37,9 @@
     "hapi": "17.x.x",
     "hapi-triton-auth": "2.x.x",
     "inert": "5.x.x",
+    "joi": "13.1.2",
     "lab": "15.x.x",
-    "stand-in": "4.x.x"
+    "stand-in": "4.x.x",
+    "testdouble": "3.7.x"
   }
 }

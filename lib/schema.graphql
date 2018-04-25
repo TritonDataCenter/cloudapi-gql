@@ -758,7 +758,7 @@ type Query {
     machine: ID!
     # NIC's MAC address
     mac: String!
-  ): [NIC]
+  ): NIC
 }
 
 type Mutation {

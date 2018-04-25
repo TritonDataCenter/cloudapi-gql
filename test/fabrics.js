@@ -116,6 +116,184 @@ describe('machines', () => {
     expect(res.result.data.networks[0].name).to.equal(network.name);
   });
 
+  it('can filter networks to a single network by id', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return network;
+      }
+
+      return [machine];
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { networks(id: "${network.id}") { id name machines { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.networks).to.exist();
+    expect(res.result.data.networks.length).to.equal(1);
+    expect(res.result.data.networks[0].id).to.equal(network.id);
+    expect(res.result.data.networks[0].name).to.equal(network.name);
+    expect(res.result.data.networks[0].machines[0].name).to.equal(machine.name);
+  });
+
+  it('can create a network', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return network;
+      }
+
+      return [machine];
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { createNetwork(vlan: ${network.vlan_id}, name: "test", subnet: "10.24.33.1/24") { id name machines { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.createNetwork).to.exist();
+    expect(res.result.data.createNetwork.id).to.equal(network.id);
+    expect(res.result.data.createNetwork.name).to.equal(network.name);
+    expect(res.result.data.createNetwork.machines[0].name).to.equal(machine.name);
+  });
+
+  it('can delete a network', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return network;
+      }
+
+      return [machine];
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { deleteNetwork(vlan: ${network.vlan_id}, id: "${network.id}") { id name } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.deleteNetwork).to.exist();
+    expect(res.result.data.deleteNetwork.id).to.equal(network.id);
+    expect(res.result.data.deleteNetwork.name).to.equal(network.name);
+  });
+
+  it('can filter networks to a vlan', async () => {
+    const server = new Hapi.Server();
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
+      if (stand.invocations === 1) {
+        return [network];
+      }
+
+      return [machine];
+    }, { stopAfter: 2 });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `query { networks(vlan: ${network.vlan_id}) { id name machines { name } } }` }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.networks).to.exist();
+    expect(res.result.data.networks.length).to.equal(1);
+    expect(res.result.data.networks[0].id).to.equal(network.id);
+    expect(res.result.data.networks[0].name).to.equal(network.name);
+    expect(res.result.data.networks[0].machines[0].name).to.equal(machine.name);
+  });
+
+  it('can get all vlans', async () => {
+    const vlans = [{
+      vlan_id: 1,
+      name: 'test',
+      description: 'test'
+    }, {
+      vlan_id: 2,
+      name: 'test2',
+      description: 'test2'
+    }];
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return vlans;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: '{ vlans { id name description } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.vlans).to.exist();
+    expect(res.result.data.vlans.length).to.equal(2);
+    expect(res.result.data.vlans[0].id).to.equal(vlans[0].vlan_id);
+    expect(res.result.data.vlans[0].name).to.equal(vlans[0].name);
+    expect(res.result.data.vlans[0].description).to.equal(vlans[0].description);
+  });
+
+  it('can get filter vlans by id', async () => {
+    const vlan = {
+      vlan_id: 1,
+      name: 'test',
+      description: 'test'
+    };
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return vlan;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: '{ vlans(id: 1) { id name description } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.vlans).to.exist();
+    expect(res.result.data.vlans.length).to.equal(1);
+    expect(res.result.data.vlans[0].id).to.equal(vlan.vlan_id);
+    expect(res.result.data.vlans[0].name).to.equal(vlan.name);
+    expect(res.result.data.vlans[0].description).to.equal(vlan.description);
+  });
+
+  it('can get a vlan by id', async () => {
+    const vlan = {
+      vlan_id: 1,
+      name: 'test',
+      description: 'test'
+    };
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return vlan;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: '{ vlan(id: 1) { id name description } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.vlan).to.exist();
+    expect(res.result.data.vlan.id).to.equal(vlan.vlan_id);
+    expect(res.result.data.vlan.name).to.equal(vlan.name);
+    expect(res.result.data.vlan.description).to.equal(vlan.description);
+  });
+
   it('can create a VLAN', async () => {
     const vlan = {
       vlan_id: 1,
@@ -139,5 +317,55 @@ describe('machines', () => {
     expect(res.result.data.createVLAN.id).to.equal(vlan.vlan_id);
     expect(res.result.data.createVLAN.name).to.equal(vlan.name);
     expect(res.result.data.createVLAN.description).to.equal(vlan.description);
+  });
+
+  it('can update a VLAN', async () => {
+    const vlan = {
+      vlan_id: 1,
+      name: 'update-test',
+      description: 'update-test-description'
+    };
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return vlan;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: 'mutation { updateVLAN(id: 1, name: "update-test", description: "update-test-description") { id name description } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.updateVLAN).to.exist();
+    expect(res.result.data.updateVLAN.id).to.equal(vlan.vlan_id);
+    expect(res.result.data.updateVLAN.name).to.equal(vlan.name);
+    expect(res.result.data.updateVLAN.description).to.equal(vlan.description);
+  });
+
+  it('can delete a VLAN', async () => {
+    const vlan = {
+      vlan_id: 1,
+      name: 'test',
+      description: 'test'
+    };
+    const server = new Hapi.Server();
+    StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
+      return vlan;
+    });
+
+    await server.register(register);
+    await server.initialize();
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: 'mutation { deleteVLAN(id: 1) { id name description } }' }
+    });
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.deleteVLAN).to.exist();
+    expect(res.result.data.deleteVLAN.id).to.equal(vlan.vlan_id);
+    expect(res.result.data.deleteVLAN.name).to.equal(vlan.name);
+    expect(res.result.data.deleteVLAN.description).to.equal(vlan.description);
   });
 });
