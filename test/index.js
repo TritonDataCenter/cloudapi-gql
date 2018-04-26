@@ -7,20 +7,26 @@ const { graphql } = require('graphi');
 const Hapi = require('hapi');
 const Lab = require('lab');
 const CloudApiGql = require('../lib/');
+const Graphi = require('graphi');
 const schema = Fs.readFileSync(Path.join(__dirname, '../lib/schema.graphql'));
 
 const lab = exports.lab = Lab.script();
 const it = lab.it;
 
 
-const register = {
-  plugin: CloudApiGql,
-  options: {
-    keyPath: Path.join(__dirname, 'test.key'),
-    keyId: 'test',
-    apiBaseUrl: 'http://localhost'
+const register = [
+  {
+    plugin: Graphi
+  },
+  {
+    plugin: CloudApiGql,
+    options: {
+      keyPath: Path.join(__dirname, 'test.key'),
+      keyId: 'test',
+      apiBaseUrl: 'http://localhost'
+    }
   }
-};
+];
 
 it('can be registered with hapi', async () => {
   const server = new Hapi.Server();

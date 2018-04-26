@@ -7,6 +7,7 @@ require('./env.js');
 const Url = require('url');
 const { renderVoyagerPage } = require('graphql-voyager/middleware');
 const { renderPlaygroundPage } = require('graphql-playground-html');
+const Graphi = require('graphi');
 const Hapi = require('hapi');
 const Inert = require('inert');
 const Sso = require('hapi-triton-auth');
@@ -80,11 +81,17 @@ const start = async () => {
       {
         plugin: CloudApiGql,
         options: {
-          authStrategy: 'sso',
           keyPath: SDC_KEY_PATH,
           keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
           apiBaseUrl: SDC_URL,
           dcName
+        }
+      },
+      {
+        plugin: Graphi,
+        options: {
+          graphiqlPath: '/graphql',
+          authStrategy: 'sso'
         }
       }
     ]);

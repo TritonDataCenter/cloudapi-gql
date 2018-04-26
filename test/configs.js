@@ -8,6 +8,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -19,17 +20,19 @@ describe('config', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
+  const register = [
+    {
+      plugin: Graphi
     },
-    routes: {
-      prefix: '/test'
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://localhost'
+      }
     }
-  };
+  ];
 
   it('can get all configs', async () => {
     const config = {
@@ -45,7 +48,7 @@ describe('config', () => {
     await server.register(register);
     await server.initialize();
     const res = await server.inject({
-      url: `/test/graphql?${query}`
+      url: `/graphql?${query}`
     });
 
     expect(res.statusCode).to.equal(200);
@@ -67,7 +70,7 @@ describe('config', () => {
     await server.register(register);
     await server.initialize();
     const res = await server.inject({
-      url: '/test/graphql',
+      url: '/graphql',
       method: 'post',
       payload: {
         query: `mutation {
