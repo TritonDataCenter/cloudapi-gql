@@ -1,13 +1,11 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
+
 
 const lab = exports.lab = Lab.script();
 const { describe, it, afterEach } = lab;
@@ -17,20 +15,6 @@ describe('images', () => {
   afterEach(() => {
     StandIn.restoreAll();
   });
-
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
 
   const image = {
     id: '2b683a82-a066-11e3-97ab-2faa44701c5a',
@@ -59,13 +43,11 @@ describe('images', () => {
   };
 
   it('can get all images', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return [image];
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -79,13 +61,11 @@ describe('images', () => {
   });
 
   it('can get all images filtered by id', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return image;
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -99,13 +79,11 @@ describe('images', () => {
   });
 
   it('can get a single image', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return image;
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -119,13 +97,11 @@ describe('images', () => {
   });
 
   it('can return error when fetch throws an exception', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       throw Error('it blowed up');
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -137,13 +113,11 @@ describe('images', () => {
   });
 
   it('can create an image from a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       return image;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -161,13 +135,11 @@ describe('images', () => {
   });
 
   it('can update an image', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       return image;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -185,13 +157,11 @@ describe('images', () => {
   });
 
   it('can delete an image', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       return image;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -210,18 +180,16 @@ describe('images', () => {
   });
 
   it('can export an image', async () => {
+    const server = await ServerHelper.getServer();
     const mantaLocation = {
       'manta_url': 'https://us-east.manta.joyent.com',
       'image_path': '/test.user/stor/test-image',
       'manifest_path': '/test.user/stor/test-image.imgmanifest'
     };
-    const server = new Hapi.Server();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       return mantaLocation;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

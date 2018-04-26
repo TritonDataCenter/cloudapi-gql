@@ -1,13 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,20 +15,6 @@ describe('packages', () => {
   afterEach(() => {
     StandIn.restoreAll();
   });
-
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
 
   const packageObj = {
     id: '7b17343c-94af-6266-e0e8-893a3b9993d0',
@@ -46,13 +29,12 @@ describe('packages', () => {
   };
 
   it('can get all packages', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return [packageObj];
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -65,13 +47,12 @@ describe('packages', () => {
   });
 
   it('can get all packages filtered by id', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return packageObj;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -84,13 +65,12 @@ describe('packages', () => {
   });
 
   it('can get a package by id', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return packageObj;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -102,13 +82,12 @@ describe('packages', () => {
   });
 
   it('can get a package by name', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return packageObj;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

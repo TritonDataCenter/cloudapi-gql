@@ -1,14 +1,11 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
 const Lab = require('lab');
-const Hapi = require('hapi');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
 const QueryString = require('querystring');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
 
 
 const lab = exports.lab = Lab.script();
@@ -25,29 +22,13 @@ describe('services', () => {
     StandIn.restoreAll();
   });
 
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
-
   it('returns a list of available services', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return serviceList;
     });
 
     const query = QueryString.stringify({ query: 'query { services { id name value } }' });
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: `/graphql?${query}`
     });

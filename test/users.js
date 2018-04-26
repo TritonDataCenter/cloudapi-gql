@@ -1,13 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,20 +15,6 @@ describe('users', () => {
   afterEach(() => {
     StandIn.restoreAll();
   });
-
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
 
   const user = {
     id: '4fc13ac6-1e7d-cd79-f3d2-96276af0d638',
@@ -52,7 +35,7 @@ describe('users', () => {
       value: 'foo'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
       if (stand.invocations === 1) {
         return user;
@@ -61,8 +44,7 @@ describe('users', () => {
       return key;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -75,14 +57,13 @@ describe('users', () => {
   });
 
   it('can update your account', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       user.firstName = options.payload.firstName;
       return user;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -96,13 +77,12 @@ describe('users', () => {
   });
 
   it('can create a subuser', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       return user;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -121,7 +101,7 @@ describe('users', () => {
       value: 'foo'
     }];
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return user;
@@ -130,8 +110,7 @@ describe('users', () => {
       return keys;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -144,13 +123,12 @@ describe('users', () => {
   });
 
   it('can query for users', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return [user];
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -162,13 +140,12 @@ describe('users', () => {
   });
 
   it('can query for users with users(id)', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return user;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -180,15 +157,14 @@ describe('users', () => {
   });
 
   it('can update user', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       const updatedUser = Object.assign({}, user);
       updatedUser.email = options.payload.email;
       return updatedUser;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -200,15 +176,14 @@ describe('users', () => {
   });
 
   it('can change user password', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       resPath = path;
       return user;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -221,15 +196,14 @@ describe('users', () => {
   });
 
   it('can delete a user', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     let fetchPath = '';
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
       fetchPath = path;
       return user;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

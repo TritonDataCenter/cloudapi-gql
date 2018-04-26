@@ -4,33 +4,16 @@ const Fs = require('fs');
 const Path = require('path');
 const { expect } = require('code');
 const { graphql } = require('graphi');
-const Hapi = require('hapi');
 const Lab = require('lab');
-const CloudApiGql = require('../lib/');
-const Graphi = require('graphi');
 const schema = Fs.readFileSync(Path.join(__dirname, '../lib/schema.graphql'));
+const ServerHelper = require('./helpers/server');
 
 const lab = exports.lab = Lab.script();
 const it = lab.it;
 
 
-const register = [
-  {
-    plugin: Graphi
-  },
-  {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
-    }
-  }
-];
-
 it('can be registered with hapi', async () => {
-  const server = new Hapi.Server();
-  await server.register(register);
+  await ServerHelper.getServer();
 });
 
 it('has a resolver for every query and mutation in the schema', async () => {
@@ -46,9 +29,7 @@ it('has a resolver for every query and mutation in the schema', async () => {
     }
   }
 
-  const server = new Hapi.Server();
-  await server.register(register);
-  await server.initialize();
+  const server = await ServerHelper.getServer();
   const paths = server.table().map((route) => {
     return route.path.substr(1);
   });

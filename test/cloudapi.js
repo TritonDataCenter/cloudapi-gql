@@ -14,7 +14,7 @@ const { describe, it } = lab;
 
 describe('cloudapi', () => {
   const keyId = 'ba:co:n1';
-  const key = Fs.readFileSync(Path.join(__dirname, 'test.key'));
+  const key = Fs.readFileSync(Path.join(__dirname, 'helpers', 'test.key'));
   const log = () => {};
 
   it('throws when missing a token in production', () => {
