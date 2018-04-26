@@ -1,14 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
-
+const ServerHelper = require('./helpers/server');
 
 const lab = exports.lab = Lab.script();
 const { describe, it, afterEach } = lab;
@@ -19,24 +15,7 @@ describe('datacenters', () => {
     StandIn.restoreAll();
   });
 
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://us-west-1.joyent.com'
-      }
-    }
-  ];
-
   it('can get the current datacenter', async () => {
-    const server = new Hapi.Server({
-      debug: { request: ['error'] }
-    });
     let fetchPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
       fetchPath = path;
@@ -53,8 +32,7 @@ describe('datacenters', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer({apiBaseUrl: 'http://us-west-1.joyent.com'});
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -68,7 +46,6 @@ describe('datacenters', () => {
   });
 
   it('can get the current datacenter configured by dcName', async () => {
-    const server = new Hapi.Server();
     let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
       resPath = path;
@@ -84,22 +61,7 @@ describe('datacenters', () => {
         }
       };
     });
-
-    await server.register([
-      {
-        plugin: Graphi
-      },
-      {
-        plugin: CloudApiGql,
-        options: {
-          keyPath: Path.join(__dirname, 'test.key'),
-          keyId: 'test',
-          apiBaseUrl: 'http://localhost',
-          dcName: 'us-west-1'
-        }
-      }
-    ]);
-    await server.initialize();
+    const server = await ServerHelper.getServer({ apiBaseUrl: 'http://localhost', dcName: 'us-west-1' });
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -113,7 +75,6 @@ describe('datacenters', () => {
   });
 
   it('can get a single datacenter by name', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return {
         res: {
@@ -128,8 +89,7 @@ describe('datacenters', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer({ apiBaseUrl: 'http://us-west-1.joyent.com' });
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -142,7 +102,6 @@ describe('datacenters', () => {
   });
 
   it('can get a single datacenter by name with unknown location', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return {
         res: {
@@ -157,8 +116,7 @@ describe('datacenters', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer({ apiBaseUrl: 'http://us-west-1.joyent.com' });
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -175,13 +133,11 @@ describe('datacenters', () => {
       'us-west-1': 'http://test.com'
     };
 
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return datacenters;
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer({ apiBaseUrl: 'http://us-west-1.joyent.com' });
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

@@ -1,13 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
 
 
 const lab = exports.lab = Lab.script();
@@ -19,20 +16,6 @@ describe('policies', () => {
     StandIn.restoreAll();
   });
 
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
-
   it('can get all policies', async () => {
     const policies = [{
       id: 'test',
@@ -41,13 +24,12 @@ describe('policies', () => {
       description: 'description'
     }];
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return policies;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -67,13 +49,12 @@ describe('policies', () => {
       description: 'description'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return policy;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -93,13 +74,12 @@ describe('policies', () => {
       description: 'description'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return policy;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -119,13 +99,12 @@ describe('policies', () => {
       description: 'bacon policy description'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return policy;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -145,7 +124,7 @@ describe('policies', () => {
       description: 'bacon policy description'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       return {
         id: policy.id,
@@ -155,8 +134,7 @@ describe('policies', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -177,13 +155,12 @@ describe('policies', () => {
       description: 'bacon policy description'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
       return policy;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

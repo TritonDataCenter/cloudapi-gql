@@ -1,14 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
-
+const ServerHelper = require('./helpers/server');
 
 const lab = exports.lab = Lab.script();
 const { describe, it, afterEach } = lab;
@@ -19,20 +15,6 @@ describe('firewallRules', () => {
     StandIn.restoreAll();
   });
 
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
-
   const firewallRule = {
     id: '38de17c4-39e8-48c7-a168-0f58083de860',
     rule: 'FROM vm 3d51f2d5-46f2-4da5-bb04-3238f2f64768 TO subnet 10.99.99.0/24 BLOCK tcp PORT 25',
@@ -41,13 +23,11 @@ describe('firewallRules', () => {
   };
 
   it('can list firewall rules', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return [firewallRule];
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -89,7 +69,6 @@ describe('firewallRules', () => {
       package: 'sdc_128'
     };
 
-    const server = new Hapi.Server();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return firewallRule;
@@ -97,8 +76,7 @@ describe('firewallRules', () => {
       return [machine];
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -113,13 +91,11 @@ describe('firewallRules', () => {
   });
 
   it('can create a firewall rule', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return firewallRule;
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -138,13 +114,11 @@ describe('firewallRules', () => {
   });
 
   it('can update a firewall rule', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return firewallRule;
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -164,13 +138,11 @@ describe('firewallRules', () => {
   });
 
   it('can enable a firewall rule', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       return firewallRule;
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -185,14 +157,12 @@ describe('firewallRules', () => {
   });
 
   it('can disable a firewall rule', async () => {
-    const server = new Hapi.Server();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', () => {
       const alteredFirewall = Object.assign({}, firewallRule, { enabled: false });
       return alteredFirewall;
     });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -207,13 +177,11 @@ describe('firewallRules', () => {
   });
 
   it('can delete a firewall rule', async () => {
-    const server = new Hapi.Server();
     StandIn.replace(CloudApi.prototype, 'fetch', () => {
       return firewallRule;
     }, { replaceAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+    const server = await ServerHelper.getServer();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

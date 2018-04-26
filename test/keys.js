@@ -1,13 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
 
 
 const lab = exports.lab = Lab.script();
@@ -19,20 +16,6 @@ describe('keys', () => {
     StandIn.restoreAll();
   });
 
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
-
   it('can get all keys', async () => {
     const keys = [{
       name: 'test',
@@ -40,13 +23,11 @@ describe('keys', () => {
       value: 'foo'
     }];
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return keys;
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -66,13 +47,11 @@ describe('keys', () => {
       value: 'foo'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return key;
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -86,7 +65,7 @@ describe('keys', () => {
   });
 
   it('can create a key', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       resPath = path;
@@ -97,8 +76,6 @@ describe('keys', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -113,7 +90,7 @@ describe('keys', () => {
   });
 
   it('can create a sub-user key', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
       resPath = path;
@@ -124,8 +101,6 @@ describe('keys', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -141,15 +116,13 @@ describe('keys', () => {
   });
 
   it('can delete a key by name', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
       return {
         name: path.split('/').pop()
       };
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -161,15 +134,13 @@ describe('keys', () => {
   });
 
   it('can delete a key by fingerprint', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
       return {
         name: path.split('/').pop()
       };
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -182,7 +153,7 @@ describe('keys', () => {
 
   it('can delete a sub-user key by name', async () => {
     const userid = '7326787b-8039-436c-a533-5038f7280f04';
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
       resPath = path;
@@ -191,8 +162,6 @@ describe('keys', () => {
       };
     });
 
-    await server.register(register);
-    await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',

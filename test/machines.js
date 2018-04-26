@@ -1,13 +1,10 @@
 'use strict';
 
-const Path = require('path');
 const { expect } = require('code');
-const Hapi = require('hapi');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
-const Graphi = require('graphi');
+const ServerHelper = require('./helpers/server');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,20 +15,6 @@ describe('machines', () => {
   afterEach(() => {
     StandIn.restoreAll();
   });
-
-  const register = [
-    {
-      plugin: Graphi
-    },
-    {
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost'
-      }
-    }
-  ];
 
   const machine = {
     id: 'b6979942-7d5d-4fe6-a2ec-b812e950625a',
@@ -72,13 +55,12 @@ describe('machines', () => {
   };
 
   it('can get all machines', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       return { payload: [machine], res: { headers: { 'x-resource-count': 10 }} };
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -93,13 +75,12 @@ describe('machines', () => {
   });
 
   it('can get a machine using machines(id)', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       return machine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -113,15 +94,14 @@ describe('machines', () => {
   });
 
   it('can get machines using machines(brand, state)', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
       expect(options.query.brand).to.equal('joyent');
       expect(options.query.state).to.equal('running');
       return { payload: [machine], res: { headers: { 'x-resource-count': 10 } } };
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -135,7 +115,7 @@ describe('machines', () => {
   });
 
   it('can get all machines with paging', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return { payload: [machine, machine], res: { headers: { 'x-resource-count': 20 }} };
@@ -144,8 +124,7 @@ describe('machines', () => {
       return { payload: [machine, machine], res: { headers: { 'x-resource-count': 10 }} };
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -161,13 +140,12 @@ describe('machines', () => {
   });
 
   it('can get a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
       return machine;
     });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -179,7 +157,7 @@ describe('machines', () => {
   });
 
   it('can get a machines metadata', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return machine;
@@ -188,8 +166,7 @@ describe('machines', () => {
       return metadata;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -228,7 +205,7 @@ describe('machines', () => {
       state: 'active'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return machine;
@@ -237,8 +214,7 @@ describe('machines', () => {
       return image;
     }, { stopAfter: 3 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -268,7 +244,7 @@ describe('machines', () => {
       vlan_id: 2
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return machine;
@@ -277,8 +253,7 @@ describe('machines', () => {
       return network;
     }, { stopAfter: 3 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -298,7 +273,7 @@ describe('machines', () => {
       updated: '2011-07-05T17:19:26+00:00'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return machine;
@@ -307,8 +282,7 @@ describe('machines', () => {
       return [snapshot];
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -328,7 +302,7 @@ describe('machines', () => {
       description: 'test'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return machine;
@@ -337,8 +311,7 @@ describe('machines', () => {
       return [firewallRule];
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -362,7 +335,7 @@ describe('machines', () => {
       }
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return machine;
@@ -371,8 +344,7 @@ describe('machines', () => {
       return [audit];
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -385,14 +357,13 @@ describe('machines', () => {
   });
 
   it('can stop a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path) => {
       const updatedMachine = Object.assign({}, machine, { state: 'stopping' });
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -405,14 +376,13 @@ describe('machines', () => {
   });
 
   it('can start a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path) => {
       const updatedMachine = Object.assign({}, machine, { state: 'running' });
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -425,14 +395,13 @@ describe('machines', () => {
   });
 
   it('can reboot a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path) => {
       const updatedMachine = Object.assign({}, machine, { state: 'stopping' });
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -445,7 +414,7 @@ describe('machines', () => {
   });
 
   it('can rename a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     const updatedMachine = Object.assign({}, machine);
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
       if (options && options.query) {
@@ -454,8 +423,7 @@ describe('machines', () => {
       return updatedMachine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -468,17 +436,16 @@ describe('machines', () => {
   });
 
   it('can create a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
       return machine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
-      payload: { query: `mutation { createMachine(name: "${machine.name}", package: "${machine.package}", image: "${machine.image}" ) { id name affinity } }` }
+      payload: { query: `mutation { createMachine(name: "${machine.name}", package: "${machine.package}", image: "${machine.image}" ) { id name } }` }
     });
 
     expect(res.statusCode).to.equal(200);
@@ -487,13 +454,12 @@ describe('machines', () => {
   });
 
   it('can delete a machine', async () => {
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
       return machine;
     }, { stopAfter: 2 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -518,7 +484,7 @@ describe('machines', () => {
       version: '1.0.0'
     };
 
-    const server = new Hapi.Server();
+    const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
       if (stand.invocations === 1) {
         return '';
@@ -529,8 +495,7 @@ describe('machines', () => {
       return packageObj;
     }, { stopAfter: 3 });
 
-    await server.register(register);
-    await server.initialize();
+
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
@@ -545,14 +510,13 @@ describe('machines', () => {
 
   describe('firewalls', () => {
     it('can enable a firewall for a machine', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', () => {
         const result = Object.assign({}, machine, { firewall_enabled: true });
         return result;
       }, { stopAfter: 2 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -564,14 +528,13 @@ describe('machines', () => {
     });
 
     it('can disable a firewall for a machine', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', () => {
         const result = Object.assign({}, machine, { firewall_enabled: false });
         return result;
       }, { stopAfter: 2 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -585,13 +548,12 @@ describe('machines', () => {
 
   describe('metadata', () => {
     it('can get all machine metadata', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return metadata;
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -603,13 +565,12 @@ describe('machines', () => {
     });
 
     it('can get an individual metadata value using metadata(name)', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return 'crispy';
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -622,13 +583,12 @@ describe('machines', () => {
     });
 
     it('can get an individual metadata value', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return 'bar';
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -640,7 +600,7 @@ describe('machines', () => {
     });
 
     it('can update machine metadata', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
         if (stand.invocations === 1) {
           return { bacon: 'crispy' };
@@ -653,8 +613,7 @@ describe('machines', () => {
         }
       }, { stopAfter: 3 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -674,7 +633,7 @@ describe('machines', () => {
     });
 
     it('can delete machine metadata', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
         if (stand.invocations === 1) {
           return {};
@@ -687,8 +646,7 @@ describe('machines', () => {
         }
       }, { stopAfter: 2 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -707,7 +665,7 @@ describe('machines', () => {
     });
 
     it('can delete all machine metadata', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
         if (stand.invocations === 1) {
           return {};
@@ -720,8 +678,7 @@ describe('machines', () => {
         }
       }, { stopAfter: 2 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -759,13 +716,12 @@ describe('machines', () => {
     }];
 
     it('can get all the nics for a machine', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return nics;
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -779,13 +735,12 @@ describe('machines', () => {
     });
 
     it('can get a nic for a machine using nics(machine, mac)', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return nics[0];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -799,13 +754,12 @@ describe('machines', () => {
     });
 
     it('can get a nic', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return nics[0];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -819,13 +773,12 @@ describe('machines', () => {
     });
 
     it('can add a nic', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return nics[0];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -839,13 +792,12 @@ describe('machines', () => {
     });
 
     it('can remove a nic', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return nics[0];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -868,13 +820,12 @@ describe('machines', () => {
     }];
 
     it('can get all snapshots by machine', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return snapshots;
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -887,13 +838,12 @@ describe('machines', () => {
     });
 
     it('can get all snapshot by machine and name', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return snapshots[0];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -906,13 +856,12 @@ describe('machines', () => {
     });
 
     it('can create a new snapshot', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return snapshots[0];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -924,7 +873,7 @@ describe('machines', () => {
     });
 
     it('can start a machine snapshot', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
         if (stand.invocations === 1) {
           return '';
@@ -932,8 +881,7 @@ describe('machines', () => {
         return machine;
       }, { stopAfter: 2 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -945,7 +893,7 @@ describe('machines', () => {
     });
 
     it('can delete a machine snapshot', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand) => {
         if (stand.invocations === 1) {
           return '';
@@ -953,8 +901,7 @@ describe('machines', () => {
         return machine;
       }, { stopAfter: 2 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -969,13 +916,12 @@ describe('machines', () => {
   describe('tags', () => {
     const tags = { bacon: 'crispy', nuts: 'salty' };
     it('can get a list of all tags for a machine', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand) => {
         return tags;
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -988,15 +934,14 @@ describe('machines', () => {
     });
 
     it('can get a tag for a machine by name', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
         const name = path.split('/').pop();
         expect(name).to.equal('bacon');
         return tags[name];
       });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -1009,7 +954,7 @@ describe('machines', () => {
     });
 
     it('can add a tag to a machine', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
         if (stand.invocations === 1) {
           expect(options.payload.steak).to.equal('medium-rare');
@@ -1023,8 +968,7 @@ describe('machines', () => {
         return Object.assign({}, tags, { steak: 'medium-rare', jenny: '8675309' });
       }, { stopAfter: 3 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -1043,7 +987,7 @@ describe('machines', () => {
     });
 
     it('can replace machine tags', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
         if (stand.invocations === 1) {
           return options.payload;
@@ -1054,8 +998,7 @@ describe('machines', () => {
         return { steak: 'medium-rare', jenny: '8675309' };
       }, { stopAfter: 3 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -1075,7 +1018,7 @@ describe('machines', () => {
     });
 
     it('can delete a machine tag', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
         if (stand.invocations === 1) {
           return '';
@@ -1086,8 +1029,7 @@ describe('machines', () => {
         return { bacon: 'crispy' };
       }, { stopAfter: 3 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
@@ -1105,7 +1047,7 @@ describe('machines', () => {
     });
 
     it('can delete all machine tags', async () => {
-      const server = new Hapi.Server();
+      const server = await ServerHelper.getServer();
       StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
         if (stand.invocations === 1) {
           return '';
@@ -1116,8 +1058,7 @@ describe('machines', () => {
         return {};
       }, { stopAfter: 3 });
 
-      await server.register(register);
-      await server.initialize();
+
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
