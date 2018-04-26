@@ -7,6 +7,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,14 +19,19 @@ describe('keys', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
+  const register = [
+    {
+      plugin: Graphi
+    },
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://localhost'
+      }
     }
-  };
+  ];
 
   it('can get all keys', async () => {
     const keys = [{
@@ -81,8 +87,9 @@ describe('keys', () => {
 
   it('can create a key', async () => {
     const server = new Hapi.Server();
+    let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
-      expect(path).to.equal('/keys');
+      resPath = path;
       return {
         name: options.payload.name,
         value: options.payload.key,
@@ -97,6 +104,7 @@ describe('keys', () => {
       method: 'post',
       payload: { query: 'mutation { createKey(name: "test", key: "foo") { name fingerprint value } }' }
     });
+    expect(resPath).to.equal('/keys');
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.createKey).to.exist();
     expect(res.result.data.createKey.name).to.equal('test');
@@ -106,8 +114,9 @@ describe('keys', () => {
 
   it('can create a sub-user key', async () => {
     const server = new Hapi.Server();
+    let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
-      expect(path).to.equal('/users/7326787b-8039-436c-a533-5038f7280f04/keys');
+      resPath = path;
       return {
         name: options.payload.name,
         value: options.payload.key,
@@ -122,6 +131,8 @@ describe('keys', () => {
       method: 'post',
       payload: { query: 'mutation { createKey(name: "test", key: "foo", user: "7326787b-8039-436c-a533-5038f7280f04") { name fingerprint value } }' }
     });
+
+    expect(resPath).to.equal('/users/7326787b-8039-436c-a533-5038f7280f04/keys');
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.createKey).to.exist();
     expect(res.result.data.createKey.name).to.equal('test');
@@ -172,8 +183,9 @@ describe('keys', () => {
   it('can delete a sub-user key by name', async () => {
     const userid = '7326787b-8039-436c-a533-5038f7280f04';
     const server = new Hapi.Server();
+    let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
-      expect(path).to.equal(`/users/${userid}/keys/test`);
+      resPath = path;
       return {
         name: path.split('/').pop()
       };
@@ -186,6 +198,7 @@ describe('keys', () => {
       method: 'post',
       payload: { query: `mutation { deleteKey(name: "test", user: "${userid}") { name } }` }
     });
+    expect(resPath).to.equal(`/users/${userid}/keys/test`);
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.deleteKey).to.exist();
     expect(res.result.data.deleteKey.name).to.equal('test');

@@ -7,6 +7,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,14 +19,19 @@ describe('machines', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
+  const register = [
+    {
+      plugin: Graphi
+    },
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://localhost'
+      }
     }
-  };
+  ];
 
   const machine = {
     id: 'b6979942-7d5d-4fe6-a2ec-b812e950625a',
@@ -472,7 +478,7 @@ describe('machines', () => {
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
-      payload: { query: `mutation { createMachine(name: "${machine.name}", package: "${machine.package}", image: "${machine.image}" ) { id name } }` }
+      payload: { query: `mutation { createMachine(name: "${machine.name}", package: "${machine.package}", image: "${machine.image}" ) { id name affinity } }` }
     });
 
     expect(res.statusCode).to.equal(200);

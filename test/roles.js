@@ -7,6 +7,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,14 +19,19 @@ describe('roles', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
+  const register = [
+    {
+      plugin: Graphi
+    },
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://localhost'
+      }
     }
-  };
+  ];
 
   it('can get all roles', async () => {
     const roles = [{

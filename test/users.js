@@ -7,6 +7,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,14 +19,19 @@ describe('users', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
+  const register = [
+    {
+      plugin: Graphi
+    },
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://localhost'
+      }
     }
-  };
+  ];
 
   const user = {
     id: '4fc13ac6-1e7d-cd79-f3d2-96276af0d638',
@@ -195,8 +201,9 @@ describe('users', () => {
 
   it('can change user password', async () => {
     const server = new Hapi.Server();
+    let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path, options) => {
-      expect(path).to.equal(`/users/${user.id}/change_password`);
+      resPath = path;
       return user;
     });
 
@@ -207,6 +214,7 @@ describe('users', () => {
       method: 'post',
       payload: { query: `mutation { changeUserPassword(id: "${user.id}", password: "password1", password_confirmation: "password1" ) { id email } }` }
     });
+    expect(resPath).to.equal(`/users/${user.id}/change_password`);
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.changeUserPassword).to.exist();
     expect(res.result.data.changeUserPassword.email).to.equal(user.email);

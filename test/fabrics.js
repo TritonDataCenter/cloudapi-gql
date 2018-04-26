@@ -7,6 +7,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,14 +19,19 @@ describe('machines', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://localhost'
+  const register = [
+    {
+      plugin: Graphi
+    },
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://localhost'
+      }
     }
-  };
+  ];
 
   const network = {
     id: '7326787b-8039-436c-a533-5038f7280f04',

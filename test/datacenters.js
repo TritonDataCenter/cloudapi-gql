@@ -7,6 +7,7 @@ const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApiGql = require('../lib/');
 const CloudApi = require('webconsole-cloudapi-client');
+const Graphi = require('graphi');
 
 
 const lab = exports.lab = Lab.script();
@@ -18,19 +19,27 @@ describe('datacenters', () => {
     StandIn.restoreAll();
   });
 
-  const register = {
-    plugin: CloudApiGql,
-    options: {
-      keyPath: Path.join(__dirname, 'test.key'),
-      keyId: 'test',
-      apiBaseUrl: 'http://us-west-1.joyent.com'
+  const register = [
+    {
+      plugin: Graphi
+    },
+    {
+      plugin: CloudApiGql,
+      options: {
+        keyPath: Path.join(__dirname, 'test.key'),
+        keyId: 'test',
+        apiBaseUrl: 'http://us-west-1.joyent.com'
+      }
     }
-  };
+  ];
 
   it('can get the current datacenter', async () => {
-    const server = new Hapi.Server();
+    const server = new Hapi.Server({
+      debug: { request: ['error'] }
+    });
+    let fetchPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
-      expect(path).to.contain('us-west-1');
+      fetchPath = path;
       return {
         res: {
           headers: {
@@ -51,6 +60,7 @@ describe('datacenters', () => {
       method: 'post',
       payload: { query: 'query { datacenter { name, place, url } }' }
     });
+    expect(fetchPath).to.contain('us-west-1');
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.datacenter.place).to.equal('Americas');
     expect(res.result.data.datacenter.name).to.equal('us-west-1');
@@ -59,8 +69,9 @@ describe('datacenters', () => {
 
   it('can get the current datacenter configured by dcName', async () => {
     const server = new Hapi.Server();
+    let resPath;
     StandIn.replaceOnce(CloudApi.prototype, 'fetch', (stand, path) => {
-      expect(path).to.contain('us-west-1');
+      resPath = path;
       return {
         res: {
           headers: {
@@ -74,21 +85,27 @@ describe('datacenters', () => {
       };
     });
 
-    await server.register({
-      plugin: CloudApiGql,
-      options: {
-        keyPath: Path.join(__dirname, 'test.key'),
-        keyId: 'test',
-        apiBaseUrl: 'http://localhost',
-        dcName: 'us-west-1'
+    await server.register([
+      {
+        plugin: Graphi
+      },
+      {
+        plugin: CloudApiGql,
+        options: {
+          keyPath: Path.join(__dirname, 'test.key'),
+          keyId: 'test',
+          apiBaseUrl: 'http://localhost',
+          dcName: 'us-west-1'
+        }
       }
-    });
+    ]);
     await server.initialize();
     const res = await server.inject({
       url: '/graphql',
       method: 'post',
       payload: { query: 'query { datacenter { name, place, url } }' }
     });
+    expect(resPath).to.contain('us-west-1');
     expect(res.statusCode).to.equal(200);
     expect(res.result.data.datacenter.place).to.equal('Americas');
     expect(res.result.data.datacenter.name).to.equal('us-west-1');
