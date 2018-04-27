@@ -1,10 +1,15 @@
 'use strict';
 
 const { expect } = require('code');
+const CloudApi = require('webconsole-cloudapi-client');
 const Lab = require('lab');
 const StandIn = require('stand-in');
-const CloudApi = require('webconsole-cloudapi-client');
+const TestDouble = require('testdouble');
+
+
 const ServerHelper = require('./helpers/server');
+const FirewallRules = require('../lib/handlers/firewallRules');
+
 
 const lab = exports.lab = Lab.script();
 const { describe, it, afterEach } = lab;
@@ -13,6 +18,7 @@ const { describe, it, afterEach } = lab;
 describe('firewallRules', () => {
   afterEach(() => {
     StandIn.restoreAll();
+    TestDouble.reset();
   });
 
   const firewallRule = {
@@ -193,5 +199,31 @@ describe('firewallRules', () => {
     expect(res.result.data.deleteFirewallRule.id).to.equal(firewallRule.id);
     expect(res.result.data.deleteFirewallRule.rule_str).to.equal(firewallRule.rule);
     expect(res.result.data.deleteFirewallRule.enabled).to.equal(firewallRule.enabled);
+  });
+
+  it('can apply tagged rules for creating a machine', async () => {
+    const fetch = TestDouble.func();
+    const rule = Object.assign({}, firewallRule);
+    rule.rule = 'FROM tag bacon TO tag flavor=smokey ALLOW udp port 8675';
+    TestDouble.when(fetch('/fwrules')).thenResolve([rule]);
+    const tags = [{ name: 'bacon' }, { name: 'flavor', value: 'smokey' }];
+    const res = await FirewallRules.firewall_rules_create_machine(fetch, { tags });
+    expect(res).to.exist();
+    expect(res.length).to.equal(1);
+    expect(res[0].rule_obj.action).to.equal('allow');
+    const tag = res[0].rule_obj.from[0][1];
+    expect(tag).to.equal('bacon');
+  });
+
+  it('can apply wildcard rules for creating a machine', async () => {
+    const fetch = TestDouble.func();
+    const rule = Object.assign({}, firewallRule);
+    rule.rule = 'FROM any TO any ALLOW udp port 8675';
+    TestDouble.when(fetch('/fwrules')).thenResolve([rule]);
+    const res = await FirewallRules.firewall_rules_create_machine(fetch, { tags: []});
+    expect(res).to.exist();
+    expect(res.length).to.equal(1);
+    expect(res[0].rule_obj.action).to.equal('allow');
+    expect(res[0].rule_obj.isWildcard).to.equal(true);
   });
 });

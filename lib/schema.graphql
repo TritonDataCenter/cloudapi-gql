@@ -566,8 +566,6 @@ type Query {
   datacenter(name: String): Datacenter
   # Provides a list of all datacenters this cloud is aware of
   datacenters: [Datacenter]
-  # Provides a list of available products in this datacenter
-  products: [Product]
   # Provides the URL endpoints for services for this datacenter. It is a mapping of service name to URL endpoint.
   services: [KeyValue]
   # Provides a list of images available in this datacenter

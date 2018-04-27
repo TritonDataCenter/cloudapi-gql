@@ -453,6 +453,35 @@ describe('machines', () => {
     expect(res.result.data.createMachine.name).to.equal(machine.name);
   });
 
+  it('can create a machine with an affinity', async () => {
+    const server = await ServerHelper.getServer();
+    let payload;
+    StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
+      if (stand.invocations === 1) {
+        payload = options.payload;
+      }
+      return machine;
+    }, { stopAfter: 2 });
+
+
+    const res = await server.inject({
+      url: '/graphql',
+      method: 'post',
+      payload: { query: `mutation { 
+        createMachine(
+          name: "${machine.name}", 
+          package: "${machine.package}", 
+          image: "${machine.image}",
+          affinity: [ { key: "instance", value: "bacon", type: MUST_EQUAL } ]
+        ) { id name } }` }
+    });
+
+    expect(res.statusCode).to.equal(200);
+    expect(res.result.data.createMachine.id).to.equal(machine.id);
+    expect(res.result.data.createMachine.name).to.equal(machine.name);
+    expect(payload.affinity).to.equal(['instance==bacon']);
+  });
+
   it('can delete a machine', async () => {
     const server = await ServerHelper.getServer();
     StandIn.replace(CloudApi.prototype, 'fetch', (stand, path, options) => {
