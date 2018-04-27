@@ -129,4 +129,29 @@ describe('formatters', () => {
     expect(result).to.exist();
     expect(result.length).to.equal(0);
   });
+
+  it('can return upper case machine brands', () => {
+    const result = Formatters.Machine.brand({brand: 'wright'});
+    expect(result).to.equal('WRIGHT');
+  });
+
+  it('can handle null machine brand', () => {
+    const result = Formatters.Machine.brand({ brand: null });
+    expect(result).to.be.null();
+  });
+
+  it('can return upper case machine state', () => {
+    const result = Formatters.Machine.state({ state: 'crispy' });
+    expect(result).to.equal('CRISPY');
+  });
+
+  it('can handle null machine state', () => {
+    const result = Formatters.Machine.state({ state: null });
+    expect(result).to.be.null();
+  });
+
+  it('can return machine primary_ip to primaryIp', () => {
+    const result = Formatters.Machine.primary_ip({ primaryIp: '86.75.30.9' });
+    expect(result).to.equal('86.75.30.9');
+  });
 });

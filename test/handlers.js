@@ -81,7 +81,6 @@ describe('handlers', () => {
       createPolicy: Joi.func().arity(2),
       updatePolicy: Joi.func().arity(2),
       deletePolicy: Joi.func().arity(2),
-      products: Joi.func(),
       rndName: Joi.func().arity(1),
       rndImageName: Joi.func().arity(1),
       role: Joi.func().arity(2),
