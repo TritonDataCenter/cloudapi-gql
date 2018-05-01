@@ -4,7 +4,7 @@ const { expect } = require('code');
 const Lab = require('lab');
 const StandIn = require('stand-in');
 const CloudApi = require('webconsole-cloudapi-client');
-const ServerHelper = require('./helpers/server');
+const ServerHelper = require('./helpers');
 
 
 const lab = exports.lab = Lab.script();
@@ -646,11 +646,11 @@ describe('machines', () => {
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
-        payload: { query: `mutation { 
+        payload: { query: `mutation {
           updateMachineMetadata(
-            id: "${machine.id}", 
+            id: "${machine.id}",
             metadata: [ { name: "bacon", value: "crispy" } ]
-          ) 
+          )
           { id metadata { name value } }
         }` }
       });
@@ -680,11 +680,11 @@ describe('machines', () => {
         url: '/graphql',
         method: 'post',
         payload: {
-          query: `mutation { 
+          query: `mutation {
           deleteMachineMetadata(
-            id: "${machine.id}", 
+            id: "${machine.id}",
             name: "root_authorized_keys"
-          ) 
+          )
           { id metadata { name value } }
         }` }
       });
@@ -712,10 +712,10 @@ describe('machines', () => {
         url: '/graphql',
         method: 'post',
         payload: {
-          query: `mutation { 
+          query: `mutation {
           deleteAllMachineMetadata(
             id: "${machine.id}"
-          ) 
+          )
           { id metadata { name value } }
         }` }
       });
@@ -1001,9 +1001,9 @@ describe('machines', () => {
       const res = await server.inject({
         url: '/graphql',
         method: 'post',
-        payload: { query: `mutation { 
-          addMachineTags(id: "${machine.id}", 
-          tags: [ { name: "steak", value: "medium-rare" }, { name: "jenny", value: "8675309" } ] ) 
+        payload: { query: `mutation {
+          addMachineTags(id: "${machine.id}",
+          tags: [ { name: "steak", value: "medium-rare" }, { name: "jenny", value: "8675309" } ] )
           { id, name, tags { name, value } } }` }
       });
       expect(res.statusCode).to.equal(200);
@@ -1032,9 +1032,9 @@ describe('machines', () => {
         url: '/graphql',
         method: 'post',
         payload: {
-          query: `mutation { 
-          replaceMachineTags(id: "${machine.id}", 
-          tags: [ { name: "steak", value: "medium-rare" }, { name: "jenny", value: "8675309" } ] ) 
+          query: `mutation {
+          replaceMachineTags(id: "${machine.id}",
+          tags: [ { name: "steak", value: "medium-rare" }, { name: "jenny", value: "8675309" } ] )
           { id, name, tags { name, value } } }` }
       });
       expect(res.statusCode).to.equal(200);
@@ -1063,9 +1063,9 @@ describe('machines', () => {
         url: '/graphql',
         method: 'post',
         payload: {
-          query: `mutation { 
-          deleteMachineTag(id: "${machine.id}", 
-          name: "nuts" ) 
+          query: `mutation {
+          deleteMachineTag(id: "${machine.id}",
+          name: "nuts" )
           { id, name, tags { name, value } } }` }
       });
       expect(res.statusCode).to.equal(200);
@@ -1092,8 +1092,8 @@ describe('machines', () => {
         url: '/graphql',
         method: 'post',
         payload: {
-          query: `mutation { 
-          deleteMachineTags(id: "${machine.id}") 
+          query: `mutation {
+          deleteMachineTags(id: "${machine.id}")
           { id, name, tags { name, value } } }` }
       });
       expect(res.statusCode).to.equal(200);

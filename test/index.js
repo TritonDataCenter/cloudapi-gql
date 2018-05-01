@@ -6,7 +6,7 @@ const { expect } = require('code');
 const { graphql } = require('graphi');
 const Lab = require('lab');
 const schema = Fs.readFileSync(Path.join(__dirname, '../lib/schema.graphql'));
-const ServerHelper = require('./helpers/server');
+const ServerHelper = require('./helpers');
 
 const lab = exports.lab = Lab.script();
 const it = lab.it;

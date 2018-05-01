@@ -6,7 +6,7 @@
   "main": "lib",
   "scripts": {
     "predev": "npm run graphdoc",
-    "dev": "NODE_ENV=development node --inspect dev-server.js",
+    "dev": "NODE_ENV=development node -r dotenv/config --inspect dev-server.js dotenv_config_path=.env",
     "fake": "graphql-faker ./lib/schema.graphql -p 4000",
     "faker": "graphql-faker ./lib/schema.graphql",
     "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
@@ -21,7 +21,6 @@
     "webconsole-cloudapi-client": "1.x.x",
     "force-array": "3.1.x",
     "fwrule": "2.0.x",
-    "graphi": "5.7.x",
     "hasha": "3.0.x",
     "lodash.uniq": "4.5.x",
     "sentiment": "4.2.x",
@@ -31,15 +30,17 @@
     "@2fd/graphdoc": "2.x.x",
     "belly-button": "4.x.x",
     "code": "5.x.x",
+    "dotenv": "5.x.x",
+    "graphi": "5.7.x",
     "graphql-faker": "1.x.x",
     "graphql-playground-html": "1.x.x",
     "graphql-voyager": "1.0.0-rc.15",
     "hapi": "17.x.x",
-    "hapi-triton-auth": "2.x.x",
+    "hapi-triton-auth": "3.x.x",
     "inert": "5.x.x",
-    "joi": "13.1.2",
+    "joi": "13.2.x",
     "lab": "15.x.x",
     "stand-in": "4.x.x",
-    "testdouble": "3.7.x"
+    "testdouble": "3.8.x"
   }
 }
