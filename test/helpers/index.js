@@ -5,7 +5,7 @@ const CloudApiGql = require('../../lib/');
 const Graphi = require('graphi');
 
 
-const getServer = async (options = {}) => {
+exports.getServer = async (options = {}) => {
   const apiBaseUrl = options.apiBaseUrl || 'http://localhost';
   const dcName = options.dcName;
 
@@ -45,8 +45,4 @@ const getServer = async (options = {}) => {
   await server.initialize();
 
   return server;
-};
-
-module.exports = {
-  getServer
 };

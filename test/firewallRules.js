@@ -5,9 +5,7 @@ const CloudApi = require('webconsole-cloudapi-client');
 const Lab = require('lab');
 const StandIn = require('stand-in');
 const TestDouble = require('testdouble');
-
-
-const ServerHelper = require('./helpers/server');
+const ServerHelper = require('./helpers');
 const FirewallRules = require('../lib/handlers/firewallRules');
 
 

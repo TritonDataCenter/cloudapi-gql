@@ -1,9 +1,5 @@
 'use strict';
 
-// Requires .env.js file with the following exports:
-// SDC_URL, SDC_KEY_ID, SDC_KEY_PATH
-require('./env.js');
-
 const Url = require('url');
 const { renderVoyagerPage } = require('graphql-voyager/middleware');
 const { renderPlaygroundPage } = require('graphql-playground-html');
@@ -14,20 +10,19 @@ const Sso = require('hapi-triton-auth');
 const CloudApiGql = require('./');
 
 const {
-  COOKIE_PASSWORD,
-  COOKIE_DOMAIN,
   SDC_KEY_PATH,
   SDC_ACCOUNT,
   SDC_KEY_ID,
   SDC_URL,
-  BASE_URL = 'http://0.0.0.0:4000',
-  DC_NAME
+  BASE_URL = 'http://0.0.0.0:8081',
+  DC_NAME,
+  PORT = 8081
 } = process.env;
 
 const start = async () => {
   const dcName = DC_NAME || Url.parse(SDC_URL).host.split('.')[0];
   const server = Hapi.server({
-    port: 4000,
+    port: PORT,
     routes: {
       cors: {
         origin: ['*'],
@@ -70,12 +65,16 @@ const start = async () => {
           baseUrl: BASE_URL,
           isDev: true,
           cookie: {
-            password: COOKIE_PASSWORD,
-            domain: COOKIE_DOMAIN,
-            isSecure: false,
-            isHttpOnly: true,
             ttl: 1000 * 60 * 60       // 1 hour
           }
+        }
+      },
+      {
+        plugin: Graphi,
+        options: {
+          graphqlPath: '/graphql',
+          graphiqlPath: '/graphiql',
+          authStrategy: 'sso'
         }
       },
       {
@@ -85,13 +84,6 @@ const start = async () => {
           keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
           apiBaseUrl: SDC_URL,
           dcName
-        }
-      },
-      {
-        plugin: Graphi,
-        options: {
-          graphiqlPath: '/graphql',
-          authStrategy: 'sso'
         }
       }
     ]);
