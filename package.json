@@ -9,7 +9,7 @@
     "dev": "NODE_ENV=development node -r dotenv/config --inspect dev-server.js dotenv_config_path=.env",
     "fake": "graphql-faker ./lib/schema.graphql -p 4000",
     "faker": "graphql-faker ./lib/schema.graphql",
-    "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./doc --force",
+    "graphdoc": "graphdoc -s ./lib/schema.graphql -o ./docs --force",
     "lint": "belly-button --fix",
     "pretest": "npm run lint",
     "test": "lab -t 100 --coverage-path lib -a code"

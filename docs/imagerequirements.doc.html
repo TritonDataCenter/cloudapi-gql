@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./styles/graphdoc.css" />
+    <title>ImageRequirements</title>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700" rel="stylesheet"><link type="text/css" rel="stylesheet" href="./assets/code.css" /><link type="text/css" rel="stylesheet" href="./assets/require-by.css" />
+</head>
+<body class="slds-scrollable--y">
+    <nav class="slds-grid slds-grid--vertical slds-col--rule-right">
+        <header class="slds-p-around--medium slds-col slds-shrik slds-grow-none">
+            <button class="slds-button slds-button--icon slds-float--right js-toggle-navigation less-than-medium">
+                <i class="material-icons">close</i>
+            </button>
+                <h3 class="slds-text-heading--medium"><a href="./">GraphQL Schema</a></h3>
+            <div class="slds-p-top--small">
+                <input id="type-search" type="text" placeholder="Search a type" autofocus="" class="slds-input" />
+            </div>
+        </header>
+        <div id="navication-scroll" class="slds-scrollable--y slds-col slds-grow">
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Schema</h4>
+    <ul>
+        <li  title="Query">
+            <a href="query.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Query
+            </a>
+        </li>
+        <li  title="Mutation">
+            <a href="mutation.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Mutation
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Scalars</h4>
+    <ul>
+        <li  title="Any">
+            <a href="any.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Any
+            </a>
+        </li>
+        <li  title="Boolean">
+            <a href="boolean.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Boolean
+            </a>
+        </li>
+        <li  title="ID">
+            <a href="id.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ID
+            </a>
+        </li>
+        <li  title="Int">
+            <a href="int.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Int
+            </a>
+        </li>
+        <li  title="String">
+            <a href="string.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                String
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Enums</h4>
+    <ul>
+        <li  title="AffinityRuleType">
+            <a href="affinityruletype.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                AffinityRuleType
+            </a>
+        </li>
+        <li  title="Brand">
+            <a href="brand.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Brand
+            </a>
+        </li>
+        <li  title="CallerType">
+            <a href="callertype.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                CallerType
+            </a>
+        </li>
+        <li  title="ImageErrorCode">
+            <a href="imageerrorcode.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageErrorCode
+            </a>
+        </li>
+        <li  title="ImageFileCompression">
+            <a href="imagefilecompression.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageFileCompression
+            </a>
+        </li>
+        <li  title="ImageOS">
+            <a href="imageos.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageOS
+            </a>
+        </li>
+        <li  title="ImageState">
+            <a href="imagestate.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageState
+            </a>
+        </li>
+        <li  title="ImageType">
+            <a href="imagetype.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageType
+            </a>
+        </li>
+        <li  title="MachineState">
+            <a href="machinestate.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                MachineState
+            </a>
+        </li>
+        <li  title="NicState">
+            <a href="nicstate.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                NicState
+            </a>
+        </li>
+        <li  title="SnapshotState">
+            <a href="snapshotstate.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                SnapshotState
+            </a>
+        </li>
+        <li  title="__DirectiveLocation">
+            <a href="directivelocation.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __DirectiveLocation
+            </a>
+        </li>
+        <li  title="__TypeKind">
+            <a href="typekind.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __TypeKind
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Interfaces</h4>
+    <ul>
+        <li  title="Page">
+            <a href="page.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Page
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Objects</h4>
+    <ul>
+        <li  title="Action">
+            <a href="action.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Action
+            </a>
+        </li>
+        <li  title="Caller">
+            <a href="caller.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Caller
+            </a>
+        </li>
+        <li  title="CreateMachineFirewallRule">
+            <a href="createmachinefirewallrule.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                CreateMachineFirewallRule
+            </a>
+        </li>
+        <li  title="Datacenter">
+            <a href="datacenter.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Datacenter
+            </a>
+        </li>
+        <li  title="FirewallRule">
+            <a href="firewallrule.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                FirewallRule
+            </a>
+        </li>
+        <li  title="Image">
+            <a href="image.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Image
+            </a>
+        </li>
+        <li  title="ImageError">
+            <a href="imageerror.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageError
+            </a>
+        </li>
+        <li  title="ImageFile">
+            <a href="imagefile.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageFile
+            </a>
+        </li>
+        <li class="slds-is-active" title="ImageRequirements">
+            <a href="imagerequirements.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                ImageRequirements
+            </a>
+        </li>
+        <li  title="Key">
+            <a href="key.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Key
+            </a>
+        </li>
+        <li  title="KeyValue">
+            <a href="keyvalue.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                KeyValue
+            </a>
+        </li>
+        <li  title="Machine">
+            <a href="machine.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Machine
+            </a>
+        </li>
+        <li  title="MachinePage">
+            <a href="machinepage.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                MachinePage
+            </a>
+        </li>
+        <li  title="MantaLocation">
+            <a href="mantalocation.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                MantaLocation
+            </a>
+        </li>
+        <li  title="Network">
+            <a href="network.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Network
+            </a>
+        </li>
+        <li  title="NIC">
+            <a href="nic.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                NIC
+            </a>
+        </li>
+        <li  title="Package">
+            <a href="package.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Package
+            </a>
+        </li>
+        <li  title="Policy">
+            <a href="policy.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Policy
+            </a>
+        </li>
+        <li  title="Product">
+            <a href="product.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Product
+            </a>
+        </li>
+        <li  title="Role">
+            <a href="role.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Role
+            </a>
+        </li>
+        <li  title="Snapshot">
+            <a href="snapshot.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                Snapshot
+            </a>
+        </li>
+        <li  title="User">
+            <a href="user.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                User
+            </a>
+        </li>
+        <li  title="VLAN">
+            <a href="vlan.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                VLAN
+            </a>
+        </li>
+        <li  title="__Directive">
+            <a href="directive.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __Directive
+            </a>
+        </li>
+        <li  title="__EnumValue">
+            <a href="enumvalue.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __EnumValue
+            </a>
+        </li>
+        <li  title="__Field">
+            <a href="field.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __Field
+            </a>
+        </li>
+        <li  title="__InputValue">
+            <a href="inputvalue.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __InputValue
+            </a>
+        </li>
+        <li  title="__Schema">
+            <a href="schema.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __Schema
+            </a>
+        </li>
+        <li  title="__Type">
+            <a href="type.spec.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                __Type
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Input Objects</h4>
+    <ul>
+        <li  title="AffinityRule">
+            <a href="affinityrule.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                AffinityRule
+            </a>
+        </li>
+        <li  title="KeyValueInput">
+            <a href="keyvalueinput.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                KeyValueInput
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical">
+    <h4 class="slds-text-title--caps slds-p-around--medium">Directives</h4>
+    <ul>
+        <li  title="deprecated">
+            <a href="deprecated.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                deprecated
+            </a>
+        </li>
+        <li  title="include">
+            <a href="include.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                include
+            </a>
+        </li>
+        <li  title="skip">
+            <a href="skip.doc.html" class="slds-navigation-list--vertical__action slds-text-link--reset slds-truncate">
+                skip
+            </a>
+        </li>
+    </ul>
+</div>
+        </div>
+    </nav>
+    <main><section class="title slds-theme--inverse">
+    <div class="container slds-grid">
+        <div>
+        <button class="slds-button js-toggle-navigation less-than-medium">
+            <i class="material-icons slds-button__icon slds-button__icon--left">menu</i>
+            <span class="slds-text-title--caps">Types<span>
+        </button>
+        </div>
+        </div>
+    </div>
+    <div class="container">
+        <p class="slds-text-title--caps slds-text-color--weak">OBJECT</p>
+        <h1 class="slds-text-heading--large">ImageRequirements</h1>
+        <div class="slds-text-body--regular"><p>A grouping of various requirements for provisioning a VM with this image</p>
+</div>
+    </div>
+</section>
+<section>
+    <div class="container">
+        <h2 id="graphql-schema-definition" class="graphdoc-section__title slds-text-heading--medium slds-m-top--small">
+            <a href="#graphql-schema-definition">
+                <i class="material-icons">link</i>
+            </a>
+            GraphQL Schema definition
+        </h2>
+        <code class="highlight"><ul class="code" style="padding-left:42px"><li><span class="keyword operator ts">type</span> <span class="identifier">ImageRequirements</span> {</li><li></li><li><span class="tab"><span class="comment line">#   An array describing the minimum number of network interfaces</span></span></li><li><span class="tab"><span class="meta">networks</span>: [<a class="support type" href="network.doc.html">Network</a>] </span></li><li></li><li><span class="tab"><span class="comment line">#   Defines the SmartOS "brand" that is required to provision with this image</span></span></li><li><span class="tab"><span class="meta">brand</span>: <a class="support type" href="brand.doc.html">Brand</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   A boolean indicating that provisioning with this image requires that an SSH </span></span></li><li><span class="tab"><span class="comment line">#   public key be provided</span></span></li><li><span class="tab"><span class="meta">ssh_key</span>: <a class="support type" href="boolean.doc.html">Boolean</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   `min_ram` is an integer number of MiB specifying the minimum RAM required to </span></span></li><li><span class="tab"><span class="comment line">#   provision this image</span></span></li><li><span class="tab"><span class="meta">min_ram</span>: <a class="support type" href="int.doc.html">Int</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   `max_ram` is an integer number of MiB specifying the maximum RAM this image may </span></span></li><li><span class="tab"><span class="comment line">#   provisioned with</span></span></li><li><span class="tab"><span class="meta">max_ram</span>: <a class="support type" href="int.doc.html">Int</a> </span></li><li></li><li><span class="tab"><span class="comment line">#   `min_platform` defines the minimum required SmartOS platform on which this image </span></span></li><li><span class="tab"><span class="comment line">#   can be used (and hence in SDC on which it will be provisioned)</span></span></li><li><span class="tab"><span class="meta">min_platform</span>: [<a class="support type" href="keyvalue.doc.html">KeyValue</a>] </span></li><li></li><li><span class="tab"><span class="comment line">#   `max_platform` defines the maximum allowed SmartOS platform on which this image </span></span></li><li><span class="tab"><span class="comment line">#   can be used (and hence in SDC on which it will be provisioned)</span></span></li><li><span class="tab"><span class="meta">max_platform</span>: [<a class="support type" href="keyvalue.doc.html">KeyValue</a>] </span></li><li>}</li></ul></code>
+    </div>
+</section>
+<section>
+    <div class="container">
+        <h2 id="require-by" class="graphdoc-section__title slds-text-heading--medium slds-m-top--small">
+            <a href="#require-by">
+                <i class="material-icons">link</i>
+            </a>
+            Require by
+        </h2>
+        <ul class="require-by"><li><a href="image.doc.html" title="Image - An image contains the software packages that will be available on newly-provisioned instance. In the case of hardware virtual machines, the image also includes the operating system">Image<em>An image contains the software packages that will be available on newly-provisioned instance. In the case of hardware virtual machines, the image also includes the operating system</em></a><li></ul>
+    </div>
+</section>
+<footer>
+<div class="container slds-p-around--large">
+    <p class="slds-text-align--right slds-text-title--caps">
+        Generated with <a href="https://github.com/2fd/graphdoc#readme" target="_blank">graphdoc 2.4.0</a>
+    </p>
+</div>
+</footer>
+</main>
+    <script src="./scripts/focus-active.js"></script>
+    <script src="./scripts/filter-types.js"></script>
+    <script src="./scripts/toggle-navigation.js"></script>
+</body>
